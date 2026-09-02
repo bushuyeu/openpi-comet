@@ -108,6 +108,35 @@ uv pip install -e bddl
 uv pip install -e OmniGibson[eval]
 ```
 
+> [!WARNING]
+> **Pin numpy after `setup.sh`.** BEHAVIOR-1K's `setup.sh` installs `numpy==1.26.4` as OmniGibson
+> requires (`numpy<2.0.0`), but the `--joylo` dependency chain (mediapipe, mujoco, dm_control)
+> then upgrades numpy to 2.x. That breaks the ABI for every pybind11 extension built against 1.x
+> and `og.launch()` dies with `Fatal Python error: Segmentation fault`, sometimes preceded by
+> `TypeError: Unable to write from unknown dtype, kind=f, size=0`. Fix:
+>
+> ```bash
+> pip install numpy==1.26.4   # in the BEHAVIOR conda env, after setup.sh completes
+> ```
+
+> [!IMPORTANT]
+> **Evaluate at native resolution.** The released checkpoints require the full-resolution
+> observations produced by `RGBWrapper` (head 720x720, wrist 480x480). Running them through
+> `RGBLowResWrapper` (224x224) does not degrade them, it disables them: the policy scores
+> `q_score = 0` on every instance, *including instances it was trained on*. The 224x224 numbers
+> in the report's Table 3 come from single-task SFT models trained at that resolution, which are
+> not part of the released model zoo.
+
+> [!NOTE]
+> **`setup.sh` fetches the 2026 challenge task instances, but `eval_custom.py` reads the 2025
+> ones** (`2025-challenge-task-instances/metadata/test_instances.csv`). Nothing downloads them, so
+> evaluation fails on a missing file after a ~2 h setup. Fetch them explicitly:
+>
+> ```python
+> from omnigibson.utils.asset_utils import download_2025_challenge_task_instances
+> download_2025_challenge_task_instances()
+> ```
+
 ## Model Zoo
 
 We provide a suite of base VLA model checkpoints trained on 1.5K hours robot trajectories, ideal for BEHAVIOR-1K fine-tuning.

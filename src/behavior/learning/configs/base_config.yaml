@@ -18,7 +18,10 @@ test_hidden: false  # [Internal use only] whether to eval on hidden test instanc
 
 # + additional config
 env_wrapper: 
-  _target_: behavior.learning.wrappers.RGBWrapper
+  # NOTE: the README installs these files into OmniGibson as omnigibson.learning.*,
+  # so the target must use that package path. 'behavior.learning.*' only resolves when
+  # running from this repo's own src/ tree and raises hydra InstantiationException otherwise.
+  _target_: omnigibson.learning.wrappers.RGBWrapper
 
 save_rollout: false
 perturb_pose: false

@@ -51,7 +51,9 @@ import torch as th
 
 m = create_module_macros(module_path=__file__)
 m.NUM_EVAL_EPISODES = 1
-m.NUM_EVAL_INSTANCES = 10
+# The public test_instances.csv ships 20 instances per task; 10 is the challenge default.
+# Override with NUM_EVAL_INSTANCES=20 to halve the width of the success-rate CI.
+m.NUM_EVAL_INSTANCES = int(os.getenv("NUM_EVAL_INSTANCES", "10"))
 m.NUM_TRAIN_INSTANCES = 200
 
 

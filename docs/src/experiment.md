@@ -71,18 +71,20 @@ This is the first question to ask, because a broken harness also gives zero.
 
 We ran the same policy on **training instances**. The policy saw this data during training, so it must do better here.
 
-| Run | Instances | Runs | Successes | Rate per run | 95% CI |
+| Run | Machine | Runs | Successes | Rate | 95% CI |
 |---|---|---|---|---|---|
-| Train instances | 16 | 20 | 2 | 0.10 | [0.03, 0.30] |
-| Test instances | 20 | 20 | 0 | 0.00 | [0.00, 0.16] |
+| Train instances | b3iq | 47 | 2 | 0.04 | [0.01, 0.14] |
+| Train instances | marklxxxv | 20 | 2 | 0.10 | [0.03, 0.30] |
+| **Train, combined** | both | **67** | **4** | **0.06** | **[0.02, 0.14]** |
+| **Test, combined** | both | **40** | **0** | **0.00** | **[0.00, 0.09]** |
 
-The train set covers 16 instances in 20 runs. Four instances ran twice.
+The harness can record a success. It is not dead. All four successes scored a full `q_score` of 1.000, not partial credit.
 
-The harness can record a success. It is not dead. Both successes scored a full `q_score` of 1.000, not partial credit.
+A failed episode runs to the 4300-step cap. The successful episodes stopped early, at 1329 and 1632 steps on marklxxxv. The episode ends when the task is complete, so the harness detects completion.
 
-The two intervals overlap. At 20 instances each, we cannot show that the train rate differs from the test rate. The control proves the harness works. It does not prove a train and test gap.
+The two combined intervals still overlap, [0.02, 0.14] against [0.00, 0.09]. We cannot show that the train rate differs from the test rate. The control proves the harness works. It does not prove a train and test gap.
 
-A failed episode runs to the 4300-step cap. The two successful episodes stopped at 1329 and 1632 steps. The episode ends when the task is complete, so the harness detects completion.
+The policy solves about 6 percent of training runs and 0 percent of test runs. It fails the rest completely.
 
 ## The same instance gives different results
 

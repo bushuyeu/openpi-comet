@@ -128,11 +128,11 @@ Table 4.</p>
 <tbody>
 <tr>
 <td>Machine</td>
-<td>RTX 3090, 24 GB</td>
+<td>RTX 3090, 24 GB. A second run used an RTX 5090, 32 GB</td>
 </tr>
 <tr>
 <td>Stack</td>
-<td>BEHAVIOR-1K v3.7.2, Isaac Sim 4.5, torch 2.6.0+cu124, numpy 1.26.4</td>
+<td>BEHAVIOR-1K v3.7.2, Isaac Sim 4.5, numpy 1.26.4. torch 2.6.0+cu124 on the RTX 3090, torch 2.7.0+cu128 on the RTX 5090</td>
 </tr>
 <tr>
 <td>Policy</td>
@@ -167,7 +167,14 @@ makes the confidence interval half as wide.</p>
 </thead>
 <tbody>
 <tr>
-<td>Baseline</td>
+<td>Baseline, RTX 3090</td>
+<td><strong>1.00</strong></td>
+<td>20</td>
+<td><strong>0.00</strong></td>
+<td>[0.00, 0.16]</td>
+</tr>
+<tr>
+<td>Baseline, RTX 5090</td>
 <td><strong>1.00</strong></td>
 <td>20</td>
 <td><strong>0.00</strong></td>
@@ -176,7 +183,11 @@ makes the confidence interval half as wide.</p>
 </tbody>
 </table></div>
 <p>The policy failed every instance. Each episode ran to the step limit of 4300
-steps. The partial-credit Q-score was 0.000 every time.</p>
+steps. The partial-credit Q-score was 0.000 every time. The step limit is the default,
+which is two times the average human demo length.</p>
+<p>A second machine gives the same result. The RTX 5090 run used the same policy, the
+same native resolution and the same 20 test instances. The card, the driver and the
+torch build differ. The simulator is the same version.</p>
 <h2 id="is-the-test-harness-good">Is the test harness good?</h2>
 <p>This is the first question to ask, because a broken harness also gives zero.</p>
 <p>We ran the same policy on <strong>training instances</strong>. The policy saw this data during
@@ -216,6 +227,10 @@ That was a mistake. The 224x224 numbers in Table 3 come from single-task models
 trained at that resolution. Those models are not public.</p>
 <p>The positive control found this error. Without the control, we would have
 reported a false result about the authors' work.</p>
+<p>The RTX 5090 run started at 224x224 and gave 0/20. It then gave 0/20 at native
+resolution as well. On the test instances both resolutions score zero, so that run
+cannot separate the two. The evidence that 224x224 zeroes the checkpoint comes from the
+train instances, not from the test instances.</p>
 <h2 id="three-readings-of-020">Three readings of 0/20</h2>
 <ol>
 <li>The claim does not reproduce.</li>
@@ -266,8 +281,11 @@ model, not a model that scores 1.00 on held-out data.</p>
 <p>Fixes for all three are in this fork.</p>
 <h2 id="hardware-note">Hardware note</h2>
 <p>Isaac Sim needs RT Cores. The A100, H100 and V100 do not have them and cannot run
-this benchmark. An RTX 5090 has RT Cores but gives a segmentation fault, because
-BEHAVIOR-1K v3.7.2 pins torch cu124, which does not support sm_120.</p>
+this benchmark. An RTX 5090 has RT Cores and runs the benchmark. It needs torch
+2.7.0+cu128, because the pinned cu124 build has no sm_120 kernels. It also needs a
+driver that the Kit build supports. We tested two. Driver 580.173.02 works. Driver
+595.84 gives a segmentation fault in the Omniverse RTX renderer. See the
+<a href="compute.html">hardware page</a>.</p>
 <h2 id="still-running">Still running</h2>
 <p>The control-mode arm of Table 3 runs now. Table 3 row #1, all on
 <code>turning_on_radio</code> at 224x224:</p>

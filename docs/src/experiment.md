@@ -64,16 +64,33 @@ This is the first question to ask, because a broken harness also gives zero.
 
 We ran the same policy on **training instances**. The policy saw this data during training, so it must do better here.
 
-| Run | n | Successes | Rate | 95% CI |
-|---|---|---|---|---|
-| Train instances | 20 | 2 | 0.10 | [0.03, 0.30] |
-| Test instances | 20 | 0 | 0.00 | [0.00, 0.16] |
+| Run | Instances | Runs | Successes | Rate per run | 95% CI |
+|---|---|---|---|---|---|
+| Train instances | 16 | 20 | 2 | 0.10 | [0.03, 0.30] |
+| Test instances | 20 | 20 | 0 | 0.00 | [0.00, 0.16] |
+
+The train set covers 16 instances in 20 runs. Four instances ran twice.
 
 The harness can record a success. It is not dead. Both successes scored a full `q_score` of 1.000, not partial credit.
 
 The two intervals overlap. At 20 instances each, we cannot show that the train rate differs from the test rate. The control proves the harness works. It does not prove a train and test gap.
 
-The policy solves 2 of 20 training instances outright and fails the other 18 completely. It does not score partial credit on any instance.
+A failed episode runs to the 4300-step cap. The two successful episodes stopped at 1329 and 1632 steps. The episode ends when the task is complete, so the harness detects completion.
+
+## The same instance gives different results
+
+Four training instances ran twice. Two of them changed outcome between runs.
+
+| Instance | First run | Second run |
+|---|---|---|
+| 1 | 0.000 | **1.000** |
+| 2 | 0.000 | 0.000 |
+| 3 | 0.000 | 0.000 |
+| 4 | **1.000** | 0.000 |
+
+Both successes come from instances that failed on their other run. One run per instance is a noisy measurement.
+
+This applies to the report as well. Figure 4 gives 1.00 from ten single runs. Table 3 and Table 4 give values that move in steps of 0.05 to 0.10. If a run can change outcome, those values carry more variance than the tables show.
 
 ## What went wrong first
 

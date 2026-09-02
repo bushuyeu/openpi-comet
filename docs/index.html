@@ -187,15 +187,17 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 <thead>
 <tr>
 <th>Run</th>
-<th>n</th>
+<th>Instances</th>
+<th>Runs</th>
 <th>Successes</th>
-<th>Rate</th>
+<th>Rate per run</th>
 <th>95% CI</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Train instances</td>
+<td>16</td>
 <td>20</td>
 <td>2</td>
 <td>0.10</td>
@@ -204,15 +206,52 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 <tr>
 <td>Test instances</td>
 <td>20</td>
+<td>20</td>
 <td>0</td>
 <td>0.00</td>
 <td>[0.00, 0.16]</td>
 </tr>
 </tbody>
 </table></div>
+<p>The train set covers 16 instances in 20 runs. Four instances ran twice.</p>
 <p>The harness can record a success. It is not dead. Both successes scored a full <code>q_score</code> of 1.000, not partial credit.</p>
 <p>The two intervals overlap. At 20 instances each, we cannot show that the train rate differs from the test rate. The control proves the harness works. It does not prove a train and test gap.</p>
-<p>The policy solves 2 of 20 training instances outright and fails the other 18 completely. It does not score partial credit on any instance.</p>
+<p>A failed episode runs to the 4300-step cap. The two successful episodes stopped at 1329 and 1632 steps. The episode ends when the task is complete, so the harness detects completion.</p>
+<h2 id="the-same-instance-gives-different-results">The same instance gives different results</h2>
+<p>Four training instances ran twice. Two of them changed outcome between runs.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Instance</th>
+<th>First run</th>
+<th>Second run</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0.000</td>
+<td><strong>1.000</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>1.000</strong></td>
+<td>0.000</td>
+</tr>
+</tbody>
+</table></div>
+<p>Both successes come from instances that failed on their other run. One run per instance is a noisy measurement.</p>
+<p>This applies to the report as well. Figure 4 gives 1.00 from ten single runs. Table 3 and Table 4 give values that move in steps of 0.05 to 0.10. If a run can change outcome, those values carry more variance than the tables show.</p>
 <h2 id="what-went-wrong-first">What went wrong first</h2>
 <p>The first run gave 0/20 at 224x224 resolution. That result was wrong, and the error was ours.</p>
 <p>The released checkpoint needs native resolution. At 224x224 it scores zero even on training data. We changed the default wrapper to 224x224 to match Table 3. That was a mistake. The 224x224 numbers in Table 3 come from single-task models trained at that resolution. Those models are not public.</p>

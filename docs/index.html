@@ -189,25 +189,30 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 <th>Run</th>
 <th>n</th>
 <th>Successes</th>
-<th>Mean Q</th>
+<th>Rate</th>
+<th>95% CI</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Train instances</td>
-<td>4</td>
-<td>1</td>
-<td>0.250</td>
+<td>20</td>
+<td>2</td>
+<td>0.10</td>
+<td>[0.03, 0.30]</td>
 </tr>
 <tr>
 <td>Test instances</td>
 <td>20</td>
 <td>0</td>
-<td>0.000</td>
+<td>0.00</td>
+<td>[0.00, 0.16]</td>
 </tr>
 </tbody>
 </table></div>
-<p>The harness can record a success. It is not dead. But the policy succeeds only about a quarter of the time on data it trained on.</p>
+<p>The harness can record a success. It is not dead. Both successes scored a full <code>q_score</code> of 1.000, not partial credit.</p>
+<p>The two intervals overlap. At 20 instances each, we cannot show that the train rate differs from the test rate. The control proves the harness works. It does not prove a train and test gap.</p>
+<p>The policy solves 2 of 20 training instances outright and fails the other 18 completely. It does not score partial credit on any instance.</p>
 <h2 id="what-went-wrong-first">What went wrong first</h2>
 <p>The first run gave 0/20 at 224x224 resolution. That result was wrong, and the error was ours.</p>
 <p>The released checkpoint needs native resolution. At 224x224 it scores zero even on training data. We changed the default wrapper to 224x224 to match Table 3. That was a mistake. The 224x224 numbers in Table 3 come from single-task models trained at that resolution. Those models are not public.</p>
@@ -283,8 +288,8 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 <p>Fixes for all three are in this fork.</p>
 <h2 id="hardware-note">Hardware note</h2>
 <p>Isaac Sim needs RT Cores. The A100, H100 and V100 do not have them and cannot run this benchmark. An RTX 5090 has RT Cores and runs the benchmark. It needs torch 2.7.0+cu128, because the pinned cu124 build has no sm_120 kernels. It also needs a driver that the Kit build supports. We tested two. Driver 580.173.02 works. Driver 595.84 gives a segmentation fault in the Omniverse RTX renderer. See the <a href="compute.html">hardware page</a>.</p>
-<h2 id="still-running">Still running</h2>
-<p>The control-mode arm of Table 3 runs now. Table 3 row #1, all on <code>turning_on_radio</code> at 224x224:</p>
+<h2 id="what-we-did-not-run">What we did not run</h2>
+<p>We stopped the control-mode arm of Table 3 after 1 instance. Table 3 row #1 gives 0.00 for temporal ensemble and 0.00 for receding temporal.</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -307,4 +312,5 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 </tr>
 </tbody>
 </table></div>
-<p>A warning about those two results. This policy gives 0.00 in every condition we tested. If the two control modes also give 0.00, they agree with the report. That agreement means little. A policy that always fails matches every prediction of zero.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>
+<p>We used the time for the positive control instead. The reason is that this policy gives 0.00 in every condition we tested. If the two control modes also give 0.00, they agree with the report, but the agreement means little. A policy that always fails matches every prediction of zero.</p>
+<p>The control tells us something the arm cannot. It shows the harness can score above zero.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>

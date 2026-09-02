@@ -64,12 +64,16 @@ This is the first question to ask, because a broken harness also gives zero.
 
 We ran the same policy on **training instances**. The policy saw this data during training, so it must do better here.
 
-| Run | n | Successes | Mean Q |
-|---|---|---|---|
-| Train instances | 4 | 1 | 0.250 |
-| Test instances | 20 | 0 | 0.000 |
+| Run | n | Successes | Rate | 95% CI |
+|---|---|---|---|---|
+| Train instances | 20 | 2 | 0.10 | [0.03, 0.30] |
+| Test instances | 20 | 0 | 0.00 | [0.00, 0.16] |
 
-The harness can record a success. It is not dead. But the policy succeeds only about a quarter of the time on data it trained on.
+The harness can record a success. It is not dead. Both successes scored a full `q_score` of 1.000, not partial credit.
+
+The two intervals overlap. At 20 instances each, we cannot show that the train rate differs from the test rate. The control proves the harness works. It does not prove a train and test gap.
+
+The policy solves 2 of 20 training instances outright and fails the other 18 completely. It does not score partial credit on any instance.
 
 ## What went wrong first
 
@@ -128,9 +132,9 @@ Fixes for all three are in this fork.
 
 Isaac Sim needs RT Cores. The A100, H100 and V100 do not have them and cannot run this benchmark. An RTX 5090 has RT Cores and runs the benchmark. It needs torch 2.7.0+cu128, because the pinned cu124 build has no sm_120 kernels. It also needs a driver that the Kit build supports. We tested two. Driver 580.173.02 works. Driver 595.84 gives a segmentation fault in the Omniverse RTX renderer. See the [hardware page](compute.html).
 
-## Still running
+## What we did not run
 
-The control-mode arm of Table 3 runs now. Table 3 row #1, all on `turning_on_radio` at 224x224:
+We stopped the control-mode arm of Table 3 after 1 instance. Table 3 row #1 gives 0.00 for temporal ensemble and 0.00 for receding temporal.
 
 | Control mode | Report |
 |---|---|
@@ -138,4 +142,6 @@ The control-mode arm of Table 3 runs now. Table 3 row #1, all on `turning_on_rad
 | Receding temporal | 0.00 |
 | Receding horizon | 0.25 |
 
-A warning about those two results. This policy gives 0.00 in every condition we tested. If the two control modes also give 0.00, they agree with the report. That agreement means little. A policy that always fails matches every prediction of zero.
+We used the time for the positive control instead. The reason is that this policy gives 0.00 in every condition we tested. If the two control modes also give 0.00, they agree with the report, but the agreement means little. A policy that always fails matches every prediction of zero.
+
+The control tells us something the arm cannot. It shows the harness can score above zero.

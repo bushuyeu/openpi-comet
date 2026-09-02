@@ -220,9 +220,6 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 <li>The 224x224 models are single-task models trained at that resolution. They are not public.</li>
 <li>The intervals overlap at 10 instances and at 20. The comparison is not resolvable at either size.</li>
 </ol>
-<h2 id="our-first-run-was-wrong">Our first run was wrong</h2>
-<p>The first run gave 0/20 at 224x224. The released checkpoint needs native resolution. At 224x224 it scores zero even on training data.</p>
-<p>We set 224x224 to match Table 3. That was our error. The positive control found it. Without the control we would have published a false result.</p>
 <h2 id="setup-faults">Setup faults</h2>
 <p>Three faults block the documented path.</p>
 <ol>

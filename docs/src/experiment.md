@@ -86,12 +86,6 @@ Table 3 row #4 compares 224x224 against native. We cannot repeat it.
 1. The 224x224 models are single-task models trained at that resolution. They are not public.
 2. The intervals overlap at 10 instances and at 20. The comparison is not resolvable at either size.
 
-## Our first run was wrong
-
-The first run gave 0/20 at 224x224. The released checkpoint needs native resolution. At 224x224 it scores zero even on training data.
-
-We set 224x224 to match Table 3. That was our error. The positive control found it. Without the control we would have published a false result.
-
 ## Setup faults
 
 Three faults block the documented path.

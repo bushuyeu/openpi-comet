@@ -1,8 +1,17 @@
 # The RFT dataset
 
-The report credits a task-balancing step for part of its score. The dataset from that step is public. This page checks the claim against the data. It needs no GPU.
+The report credits a task-balancing step for part of its score. The authors released the dataset that step produced. This page checks their claim against their own data. It needs no GPU.
 
-Source: `delinqu/comet-1.5k`. Files `meta/episodes.jsonl` and `meta/info.json`. 1469 episodes. 39 tasks.
+The authors call it "our RFT dataset" in the repository README and link to it. The upload handle `delinqu` matches Delin Qu, a core contributor.
+
+| Item | Value |
+|---|---|
+| Dataset | [`delinqu/comet-1.5k`](https://huggingface.co/datasets/delinqu/comet-1.5k) |
+| Files read | `meta/episodes.jsonl`, `meta/info.json` |
+| Episodes | 1469 |
+| Tasks | 39 of 50 |
+
+This is the artifact the method produced, not a reconstruction. Any claim about the balancing step must hold in it.
 
 ## The claim
 

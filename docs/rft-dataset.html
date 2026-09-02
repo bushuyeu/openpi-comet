@@ -42,8 +42,35 @@ footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--rule);
 font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 @media(max-width:640px){body{font-size:16px}.wrap{padding:0 16px 70px}.nav a.ext{margin-left:0}}
 </style></head><body><div class="wrap"><nav class="nav"><a href="index.html">The experiment</a><a href="rft-dataset.html" class="on">RFT dataset</a><a href="compute.html">Hardware</a><a class="ext" href="https://github.com/bushuyeu/openpi-comet">repo &#8599;</a></nav><h1 id="the-rft-dataset">The RFT dataset</h1>
-<p>The report credits a task-balancing step for part of its score. The dataset from that step is public. This page checks the claim against the data. It needs no GPU.</p>
-<p>Source: <code>delinqu/comet-1.5k</code>. Files <code>meta/episodes.jsonl</code> and <code>meta/info.json</code>. 1469 episodes. 39 tasks.</p>
+<p>The report credits a task-balancing step for part of its score. The authors released the dataset that step produced. This page checks their claim against their own data. It needs no GPU.</p>
+<p>The authors call it "our RFT dataset" in the repository README and link to it. The upload handle <code>delinqu</code> matches Delin Qu, a core contributor.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dataset</td>
+<td><a href="https://huggingface.co/datasets/delinqu/comet-1.5k"><code>delinqu/comet-1.5k</code></a></td>
+</tr>
+<tr>
+<td>Files read</td>
+<td><code>meta/episodes.jsonl</code>, <code>meta/info.json</code></td>
+</tr>
+<tr>
+<td>Episodes</td>
+<td>1469</td>
+</tr>
+<tr>
+<td>Tasks</td>
+<td>39 of 50</td>
+</tr>
+</tbody>
+</table></div>
+<p>This is the artifact the method produced, not a reconstruction. Any claim about the balancing step must hold in it.</p>
 <h2 id="the-claim">The claim</h2>
 <div class="tw"><table>
 <thead>

@@ -44,9 +44,7 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 </style></head><body><div class="wrap"><nav class="nav"><a href="index.html" class="on">The experiment</a><a href="rft-dataset.html">RFT dataset</a><a href="compute.html">Hardware</a><a class="ext" href="https://github.com/bushuyeu/openpi-comet">repo &#8599;</a></nav><h1 id="the-radio-probe">The radio probe</h1>
 <p>A test of one claim from <em>Openpi Comet</em> (arXiv:2512.10071v3).</p>
 <h2 id="the-claim">The claim</h2>
-<p>Figure 4 of the report gives a success rate of <strong>1.00</strong> for the task
-<code>turning_on_radio</code>. The report also uses this task for every cell of Table 3 and
-Table 4.</p>
+<p>Figure 4 of the report gives a success rate of <strong>1.00</strong> for the task <code>turning_on_radio</code>. The report also uses this task for every cell of Table 3 and Table 4.</p>
 <p>Figure 4 reports 25 tasks with a non-zero rate, out of 50. The spread:</p>
 <div class="tw"><table>
 <thead>
@@ -114,8 +112,7 @@ Table 4.</p>
 <ul>
 <li>The authors chose it. Their own ablations run on it.</li>
 <li>The claim is exact. A rate of 1.00 is easy to disprove.</li>
-<li>It is the shortest task in the benchmark. 934 frames is 31 seconds at 30 fps.
-  The next shortest task is 2.5 times longer.</li>
+<li>It is the shortest task in the benchmark. 934 frames is 31 seconds at 30 fps. The next shortest task is 2.5 times longer.</li>
 </ul>
 <h2 id="setup">Setup</h2>
 <div class="tw"><table>
@@ -152,8 +149,7 @@ Table 4.</p>
 </tr>
 </tbody>
 </table></div>
-<p>The report used 10 instances. The public file supplies 20. We use all 20. This
-makes the confidence interval half as wide.</p>
+<p>The report used 10 instances. The public file supplies 20. We use all 20. This makes the confidence interval half as wide.</p>
 <h2 id="result">Result</h2>
 <div class="tw"><table>
 <thead>
@@ -182,16 +178,11 @@ makes the confidence interval half as wide.</p>
 </tr>
 </tbody>
 </table></div>
-<p>The policy failed every instance. Each episode ran to the step limit of 4300
-steps. The partial-credit Q-score was 0.000 every time. The step limit is the default,
-which is two times the average human demo length.</p>
-<p>A second machine gives the same result. The RTX 5090 run used the same policy, the
-same native resolution and the same 20 test instances. The card, the driver and the
-torch build differ. The simulator is the same version.</p>
+<p>The policy failed every instance. Each episode ran to the step limit of 4300 steps. The partial-credit Q-score was 0.000 every time. The step limit is the default, which is two times the average human demo length.</p>
+<p>A second machine gives the same result. The RTX 5090 run used the same policy, the same native resolution and the same 20 test instances. The card, the driver and the torch build differ. The simulator is the same version.</p>
 <h2 id="is-the-test-harness-good">Is the test harness good?</h2>
 <p>This is the first question to ask, because a broken harness also gives zero.</p>
-<p>We ran the same policy on <strong>training instances</strong>. The policy saw this data during
-training, so it must do better here.</p>
+<p>We ran the same policy on <strong>training instances</strong>. The policy saw this data during training, so it must do better here.</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -216,21 +207,12 @@ training, so it must do better here.</p>
 </tr>
 </tbody>
 </table></div>
-<p>The harness can record a success. It is not dead. But the policy succeeds only
-about a quarter of the time on data it trained on.</p>
+<p>The harness can record a success. It is not dead. But the policy succeeds only about a quarter of the time on data it trained on.</p>
 <h2 id="what-went-wrong-first">What went wrong first</h2>
-<p>The first run gave 0/20 at 224x224 resolution. That result was wrong, and the
-error was ours.</p>
-<p>The released checkpoint needs native resolution. At 224x224 it scores zero even
-on training data. We changed the default wrapper to 224x224 to match Table 3.
-That was a mistake. The 224x224 numbers in Table 3 come from single-task models
-trained at that resolution. Those models are not public.</p>
-<p>The positive control found this error. Without the control, we would have
-reported a false result about the authors' work.</p>
-<p>The RTX 5090 run started at 224x224 and gave 0/20. It then gave 0/20 at native
-resolution as well. On the test instances both resolutions score zero, so that run
-cannot separate the two. The evidence that 224x224 zeroes the checkpoint comes from the
-train instances, not from the test instances.</p>
+<p>The first run gave 0/20 at 224x224 resolution. That result was wrong, and the error was ours.</p>
+<p>The released checkpoint needs native resolution. At 224x224 it scores zero even on training data. We changed the default wrapper to 224x224 to match Table 3. That was a mistake. The 224x224 numbers in Table 3 come from single-task models trained at that resolution. Those models are not public.</p>
+<p>The positive control found this error. Without the control, we would have reported a false result about the authors' work.</p>
+<p>The RTX 5090 run started at 224x224 and gave 0/20. It then gave 0/20 at native resolution as well. On the test instances both resolutions score zero, so that run cannot separate the two. The evidence that 224x224 zeroes the checkpoint comes from the train instances, not from the test instances.</p>
 <h2 id="three-readings-of-020">Three readings of 0/20</h2>
 <ol>
 <li>The claim does not reproduce.</li>
@@ -264,11 +246,8 @@ train instances, not from the test instances.</p>
 </tr>
 </tbody>
 </table></div>
-<p>The build date and the model card point to the Q 0.345 model. The directory name
-and the model-zoo text point to the pre-training model. The README calls the same
-files both things. We cannot settle this from the public record.</p>
-<p>Reading 3 is limited by the control. The policy succeeds on training instances at
-native resolution. A dead harness cannot do that.</p>
+<p>The build date and the model card point to the Q 0.345 model. The directory name and the model-zoo text point to the pre-training model. The README calls the same files both things. We cannot settle this from the public record.</p>
+<p>Reading 3 is limited by the control. The policy succeeds on training instances at native resolution. A dead harness cannot do that.</p>
 <h2 id="what-we-cannot-test">What we cannot test</h2>
 <p>Table 3 row #4 compares the two resolutions.</p>
 <div class="tw"><table>
@@ -292,31 +271,20 @@ native resolution. A dead harness cannot do that.</p>
 <p>We cannot repeat this for two reasons.</p>
 <ol>
 <li>The 224x224 models are not public.</li>
-<li>At 10 instances the two intervals overlap. At 20 they still overlap. The
-   comparison is not resolvable at either sample size.</li>
+<li>At 10 instances the two intervals overlap. At 20 they still overlap. The comparison is not resolvable at either sample size.</li>
 </ol>
 <h2 id="setup-problems-found">Setup problems found</h2>
 <p>Three faults block the documented path. Each one stops evaluation.</p>
 <ol>
-<li><code>base_config.yaml</code> points at <code>behavior.learning.wrappers.RGBWrapper</code>. After
-   the install step in the README, the package is <code>omnigibson.learning</code>. Hydra
-   raises <code>InstantiationException</code>.</li>
-<li><code>setup.sh</code> installs numpy 1.26.4. The <code>--joylo</code> dependencies then upgrade numpy
-   to 2.x. This breaks the ABI, and <code>og.launch()</code> gives a segmentation fault.</li>
-<li><code>setup.sh</code> downloads the 2026 task instances. <code>eval_custom.py</code> reads the 2025
-   instances. Nothing downloads them.</li>
+<li><code>base_config.yaml</code> points at <code>behavior.learning.wrappers.RGBWrapper</code>. After the install step in the README, the package is <code>omnigibson.learning</code>. Hydra raises <code>InstantiationException</code>.</li>
+<li><code>setup.sh</code> installs numpy 1.26.4. The <code>--joylo</code> dependencies then upgrade numpy to 2.x. This breaks the ABI, and <code>og.launch()</code> gives a segmentation fault.</li>
+<li><code>setup.sh</code> downloads the 2026 task instances. <code>eval_custom.py</code> reads the 2025 instances. Nothing downloads them.</li>
 </ol>
 <p>Fixes for all three are in this fork.</p>
 <h2 id="hardware-note">Hardware note</h2>
-<p>Isaac Sim needs RT Cores. The A100, H100 and V100 do not have them and cannot run
-this benchmark. An RTX 5090 has RT Cores and runs the benchmark. It needs torch
-2.7.0+cu128, because the pinned cu124 build has no sm_120 kernels. It also needs a
-driver that the Kit build supports. We tested two. Driver 580.173.02 works. Driver
-595.84 gives a segmentation fault in the Omniverse RTX renderer. See the
-<a href="compute.html">hardware page</a>.</p>
+<p>Isaac Sim needs RT Cores. The A100, H100 and V100 do not have them and cannot run this benchmark. An RTX 5090 has RT Cores and runs the benchmark. It needs torch 2.7.0+cu128, because the pinned cu124 build has no sm_120 kernels. It also needs a driver that the Kit build supports. We tested two. Driver 580.173.02 works. Driver 595.84 gives a segmentation fault in the Omniverse RTX renderer. See the <a href="compute.html">hardware page</a>.</p>
 <h2 id="still-running">Still running</h2>
-<p>The control-mode arm of Table 3 runs now. Table 3 row #1, all on
-<code>turning_on_radio</code> at 224x224:</p>
+<p>The control-mode arm of Table 3 runs now. Table 3 row #1, all on <code>turning_on_radio</code> at 224x224:</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -339,7 +307,4 @@ driver that the Kit build supports. We tested two. Driver 580.173.02 works. Driv
 </tr>
 </tbody>
 </table></div>
-<p>A warning about those two results. This policy gives 0.00 in every condition we
-tested. If the two control modes also give 0.00, they agree with the report. That
-agreement means little. A policy that always fails matches every prediction of
-zero.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>
+<p>A warning about those two results. This policy gives 0.00 in every condition we tested. If the two control modes also give 0.00, they agree with the report. That agreement means little. A policy that always fails matches every prediction of zero.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>

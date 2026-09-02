@@ -42,10 +42,8 @@ footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--rule);
 font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 @media(max-width:640px){body{font-size:16px}.wrap{padding:0 16px 70px}.nav a.ext{margin-left:0}}
 </style></head><body><div class="wrap"><nav class="nav"><a href="index.html">The experiment</a><a href="rft-dataset.html" class="on">RFT dataset</a><a href="compute.html">Hardware</a><a class="ext" href="https://github.com/bushuyeu/openpi-comet">repo &#8599;</a></nav><h1 id="the-rft-dataset">The RFT dataset</h1>
-<p>The report credits a task-balancing step for part of its score. The dataset from
-that step is public. This page checks the claim against the data. It needs no GPU.</p>
-<p>Source: <code>delinqu/comet-1.5k</code>. Files <code>meta/episodes.jsonl</code> and <code>meta/info.json</code>.
-1469 episodes. 39 tasks.</p>
+<p>The report credits a task-balancing step for part of its score. The dataset from that step is public. This page checks the claim against the data. It needs no GPU.</p>
+<p>Source: <code>delinqu/comet-1.5k</code>. Files <code>meta/episodes.jsonl</code> and <code>meta/info.json</code>. 1469 episodes. 39 tasks.</p>
 <h2 id="the-claim">The claim</h2>
 <div class="tw"><table>
 <thead>
@@ -78,10 +76,8 @@ that step is public. This page checks the claim against the data. It needs no GP
 </tr>
 </tbody>
 </table></div>
-<p>The method runs 3 rounds. Each round makes about 8500 rollouts. It keeps 1469
-trajectories from about 25,500.</p>
-<p>A balancing step must make the kept set more even across tasks. This page tests
-that.</p>
+<p>The method runs 3 rounds. Each round makes about 8500 rollouts. It keeps 1469 trajectories from about 25,500.</p>
+<p>A balancing step must make the kept set more even across tasks. This page tests that.</p>
 <h2 id="the-count-matches">The count matches</h2>
 <p>The dataset holds 1469 episodes. Section 4.3 gives the same number.</p>
 <h2 id="balancing-caps-the-common-tasks">Balancing caps the common tasks</h2>
@@ -89,8 +85,7 @@ that.</p>
 <pre><code>120 120 120 120 120 118 111 109 65 58 50 44 37 32 31 30 26 24 14
  12  11  11  10   9   8   8   8   7  7  6  6  4  4  2  2  2  1  1  1
 </code></pre>
-<p>Five tasks stop at exactly 120. Three more stop just below it. The step removes
-episodes from the common tasks. It adds none to the rare tasks.</p>
+<p>Five tasks stop at exactly 120. Three more stop just below it. The step removes episodes from the common tasks. It adds none to the rare tasks.</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -142,16 +137,12 @@ episodes from the common tasks. It adds none to the rare tasks.</p>
 </tr>
 </tbody>
 </table></div>
-<p>The method takes most of its data from the short tasks. Section 5 of the report
-states that sampling efficiency is low. This number gives the size of that limit.</p>
+<p>The method takes most of its data from the short tasks. Section 5 of the report states that sampling efficiency is low. This number gives the size of that limit.</p>
 <h2 id="eleven-tasks-produced-nothing">Eleven tasks produced nothing</h2>
-<p>The dataset covers 39 tasks. The benchmark has 50. About 25,500 rollouts produced
-no kept episode for the other 11.</p>
-<p>The method adds no data for the hardest tasks. It cannot raise the score on them.
-The gap to the theoretical best of 0.611 stays.</p>
+<p>The dataset covers 39 tasks. The benchmark has 50. About 25,500 rollouts produced no kept episode for the other 11.</p>
+<p>The method adds no data for the hardest tasks. It cannot raise the score on them. The gap to the theoretical best of 0.611 stays.</p>
 <h2 id="the-native-resolution-is-720-and-480">The native resolution is 720 and 480</h2>
-<p>The dataset stores the head camera at 720x720. It stores each wrist camera at
-480x480. Row #4 of Table 3 uses the same two settings.</p>
+<p>The dataset stores the head camera at 720x720. It stores each wrist camera at 480x480. Row #4 of Table 3 uses the same two settings.</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -170,15 +161,10 @@ The gap to the theoretical best of 0.611 stays.</p>
 </tr>
 </tbody>
 </table></div>
-<p>The 224x224 setting downsamples data that is native at 720 and 480. The gain in
-row #4 comes from keeping the native data.</p>
+<p>The 224x224 setting downsamples data that is native at 720 and 480. The gain in row #4 comes from keeping the native data.</p>
 <h2 id="the-frame-count-is-stale">The frame count is stale</h2>
-<p><code>info.json</code> gives <code>total_frames</code> as 12,226,350. The episode lengths in
-<code>episodes.jsonl</code> sum to 14,896,614. The difference is 2,670,264 frames, or 18%.</p>
-<p>The count was probably not rebuilt after the last filter step. No result on this
-page depends on it.</p>
+<p><code>info.json</code> gives <code>total_frames</code> as 12,226,350. The episode lengths in <code>episodes.jsonl</code> sum to 14,896,614. The difference is 2,670,264 frames, or 18%.</p>
+<p>The count was probably not rebuilt after the last filter step. No result on this page depends on it.</p>
 <h2 id="conclusion">Conclusion</h2>
-<p>The report credits task balancing. The data shows the balancing step does little.
-The distribution stays uneven at 120 to 1.</p>
-<p>The data shows a different pattern. The method collects data where episodes are
-short. It collects almost none where episodes are long.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>
+<p>The report credits task balancing. The data shows the balancing step does little. The distribution stays uneven at 120 to 1.</p>
+<p>The data shows a different pattern. The method collects data where episodes are short. It collects almost none where episodes are long.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>

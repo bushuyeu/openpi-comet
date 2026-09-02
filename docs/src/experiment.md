@@ -2,6 +2,12 @@
 
 A test of one claim from *Openpi Comet* (arXiv:2512.10071v3).
 
+## Result in one line
+
+The report gives a success rate of 1.00 for `turning_on_radio`. We measure **0 successes in 40 runs**, on two GPUs, using the settings the report favours. The 95% confidence interval is [0.00, 0.09].
+
+A positive control on training data gives 4 successes in 67 runs, so the test harness records successes.
+
 ## The claim
 
 Figure 4 of the report gives a success rate of **1.00** for the task `turning_on_radio`. The report also uses this task for every cell of Table 3 and Table 4.
@@ -56,10 +62,13 @@ The report used 10 instances. The public file supplies 20. We use all 20. This m
 
 ## Result
 
-| Config | Report | n | Ours | 95% CI |
+| Run | Report | n | Ours | 95% CI |
 |---|---|---|---|---|
-| Baseline, RTX 3090 | **1.00** | 20 | **0.00** | [0.00, 0.16] |
-| Baseline, RTX 5090 | **1.00** | 20 | **0.00** | [0.00, 0.16] |
+| Baseline, RTX 3090 | 1.00 | 20 | 0.00 | [0.00, 0.16] |
+| Baseline, RTX 5090 | 1.00 | 20 | 0.00 | [0.00, 0.16] |
+| **Combined** | **1.00** | **40** | **0.00** | **[0.00, 0.09]** |
+
+The interval excludes 1.00 by a wide margin. A rate of 1.00 cannot produce 40 failures.
 
 The policy failed every instance. Each episode ran to the step limit of 4300 steps. The partial-credit Q-score was 0.000 every time. The step limit is the default, which is two times the average human demo length.
 

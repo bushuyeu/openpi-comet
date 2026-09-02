@@ -43,6 +43,9 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 @media(max-width:640px){body{font-size:16px}.wrap{padding:0 16px 70px}.nav a.ext{margin-left:0}}
 </style></head><body><div class="wrap"><nav class="nav"><a href="index.html" class="on">The experiment</a><a href="rft-dataset.html">RFT dataset</a><a href="compute.html">Hardware</a><a class="ext" href="https://github.com/bushuyeu/openpi-comet">repo &#8599;</a></nav><h1 id="the-radio-probe">The radio probe</h1>
 <p>A test of one claim from <em>Openpi Comet</em> (arXiv:2512.10071v3).</p>
+<h2 id="result-in-one-line">Result in one line</h2>
+<p>The report gives a success rate of 1.00 for <code>turning_on_radio</code>. We measure <strong>0 successes in 40 runs</strong>, on two GPUs, using the settings the report favours. The 95% confidence interval is [0.00, 0.09].</p>
+<p>A positive control on training data gives 4 successes in 67 runs, so the test harness records successes.</p>
 <h2 id="the-claim">The claim</h2>
 <p>Figure 4 of the report gives a success rate of <strong>1.00</strong> for the task <code>turning_on_radio</code>. The report also uses this task for every cell of Table 3 and Table 4.</p>
 <p>Figure 4 reports 25 tasks with a non-zero rate, out of 50. The spread:</p>
@@ -161,7 +164,7 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 <div class="tw"><table>
 <thead>
 <tr>
-<th>Config</th>
+<th>Run</th>
 <th>Report</th>
 <th>n</th>
 <th>Ours</th>
@@ -171,20 +174,28 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 <tbody>
 <tr>
 <td>Baseline, RTX 3090</td>
-<td><strong>1.00</strong></td>
+<td>1.00</td>
 <td>20</td>
-<td><strong>0.00</strong></td>
+<td>0.00</td>
 <td>[0.00, 0.16]</td>
 </tr>
 <tr>
 <td>Baseline, RTX 5090</td>
-<td><strong>1.00</strong></td>
+<td>1.00</td>
 <td>20</td>
-<td><strong>0.00</strong></td>
+<td>0.00</td>
 <td>[0.00, 0.16]</td>
+</tr>
+<tr>
+<td><strong>Combined</strong></td>
+<td><strong>1.00</strong></td>
+<td><strong>40</strong></td>
+<td><strong>0.00</strong></td>
+<td><strong>[0.00, 0.09]</strong></td>
 </tr>
 </tbody>
 </table></div>
+<p>The interval excludes 1.00 by a wide margin. A rate of 1.00 cannot produce 40 failures.</p>
 <p>The policy failed every instance. Each episode ran to the step limit of 4300 steps. The partial-credit Q-score was 0.000 every time. The step limit is the default, which is two times the average human demo length.</p>
 <p>A second machine gives the same result. The RTX 5090 run used the same policy, the same native resolution and the same 20 test instances. The card, the driver and the torch build differ. The simulator is the same version.</p>
 <h2 id="is-the-test-harness-good">Is the test harness good?</h2>

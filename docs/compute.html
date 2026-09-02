@@ -91,7 +91,7 @@ scene with hardware ray tracing. It needs RT Cores.</p>
 <td>Blackwell</td>
 <td>RTX 5090</td>
 <td>Yes</td>
-<td>See below</td>
+<td>Yes, on driver 580.173.02</td>
 </tr>
 </tbody>
 </table></div>
@@ -100,8 +100,11 @@ evaluate on an H200.</p>
 <p>The report states the same constraint in Section 4.3. It gives this as the reason
 to choose rejection sampling over online reinforcement learning. Online training
 needs both GPU types at the same time.</p>
-<h2 id="the-rtx-5090-fails">The RTX 5090 fails</h2>
-<p>The RTX 5090 has RT Cores, but it still fails. We tested three causes.</p>
+<h2 id="the-rtx-5090-works">The RTX 5090 works</h2>
+<p>An earlier version of this page said the RTX 5090 fails. That was wrong. The cause
+of the renderer crash was the NVIDIA driver. We replaced the driver, changed nothing
+else, and the crash stopped. The card still needs a torch build with sm_120 kernels,
+but that change alone did not stop the crash.</p>
 <div class="tw"><table>
 <thead>
 <tr>
@@ -119,21 +122,63 @@ needs both GPU types at the same time.</p>
 <tr>
 <td>torch has no sm_120 kernels</td>
 <td>torch 2.6.0+cu124 stops at sm_90. We installed 2.7.0+cu128</td>
-<td>Not enough. It still fails</td>
+<td>Needed, but not enough alone</td>
 </tr>
 <tr>
 <td>numpy ABI</td>
 <td>OmniGibson needs numpy below 2.0. Both machines had 2.2.6</td>
 <td>This fixed the RTX 3090</td>
 </tr>
+<tr>
+<td>NVIDIA driver</td>
+<td>We replaced driver 595.84 with 580.173.02</td>
+<td>This fixed the RTX 5090</td>
+</tr>
 </tbody>
 </table></div>
-<p>With numpy pinned on both machines, and a torch build that covers each card:</p>
+<p>Driver 595.84 breaks the Omniverse RTX renderer. It breaks two Isaac Sim versions at
+the same point.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Isaac Sim</th>
+<th>Kit</th>
+<th>Driver 595.84</th>
+<th>Driver 580.173.02</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.5.0.0, the pinned version</td>
+<td>106.5</td>
+<td>Segmentation fault</td>
+<td>Starts</td>
+</tr>
+<tr>
+<td>5.1.0.0</td>
+<td>107.3.3</td>
+<td>Segmentation fault</td>
+<td>Starts</td>
+</tr>
+</tbody>
+</table></div>
+<p>Isaac Sim 5.1 supports Blackwell, and it also failed on driver 595.84. The fault
+repeats across two Kit versions, which makes a limit of one Kit version unlikely.</p>
+<p>A stock Isaac Sim script gives the same fault. OmniGibson is not needed to
+reproduce it:</p>
+<pre><code>from isaacsim import SimulationApp
+app = SimulationApp({"headless": True})</code></pre>
+<p>The crash reporter in Isaac Sim 5.1 names the faulting module as
+<code>librtx.scenedb.plugin.so</code>, called from
+<code>libcarb.scenerenderer-rtx.plugin.so</code>. A faulting module is not always the
+root cause. Four renderer settings changed nothing: path tracing, async rendering off,
+renderer off, and ray tracing off.</p>
 <div class="tw"><table>
 <thead>
 <tr>
 <th>Card</th>
 <th>Compute capability</th>
+<th>Driver</th>
 <th><code>og.launch()</code></th>
 </tr>
 </thead>
@@ -141,18 +186,34 @@ needs both GPU types at the same time.</p>
 <tr>
 <td>RTX 3090</td>
 <td>sm_86</td>
+<td>580.126.09</td>
 <td>Returns 0</td>
 </tr>
 <tr>
 <td>RTX 5090</td>
 <td>sm_120</td>
+<td>595.84</td>
 <td>Segmentation fault</td>
+</tr>
+<tr>
+<td>RTX 5090</td>
+<td>sm_120</td>
+<td>580.173.02</td>
+<td>Returns 0</td>
 </tr>
 </tbody>
 </table></div>
-<p>BEHAVIOR-1K v3.7.2 pins torch cu124. That build predates the RTX 5090.</p>
+<p>The RTX 5090 still needs a torch build with sm_120 kernels. Use torch 2.7.0+cu128.
+The pinned cu124 build stops at sm_90.</p>
+<p>We did not test the RTX 3090 on driver 595.84, so we cannot say whether that driver
+also breaks Ampere. Both working machines run a 580 driver. The two machines never had
+the same driver. The earlier version of this page read that difference as a difference
+between the cards.</p>
 <h2 id="what-we-used">What we used</h2>
-<p>RTX 3090, 24 GB. The policy server takes about 9 GB. Isaac Sim takes about 8 GB.</p>
+<p>RTX 3090, 24 GB, driver 580.126.09. The policy server takes about 9 GB. Isaac Sim
+takes about 8 GB.</p>
+<p>RTX 5090, 32 GB, driver 580.173.02, torch 2.7.0+cu128. At native resolution the
+policy server takes about 9 GB. Each Isaac Sim shard takes about 10 GB.</p>
 <h2 id="cluster-note">Cluster note</h2>
 <p>We checked the ACCESS-CI catalog. The A40 nodes on NCSA Delta are the only clear
 RT-Core GPUs in it. DeltaAI, Vista, Lonestar6, Bridges-2, Expanse, Anvil and ACES

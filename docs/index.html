@@ -219,13 +219,41 @@ reported a false result about the authors' work.</p>
 <h2 id="three-readings-of-020">Three readings of 0/20</h2>
 <ol>
 <li>The claim does not reproduce.</li>
-<li>The released checkpoint is not the model in Figure 4. The README calls it both
-   the pre-training model (Q-score 0.192) and the post-training model
-   (Q-score 0.345). Both cannot be true.</li>
+<li>The released checkpoint is not the model in Figure 4.</li>
 <li>Our setup is still wrong in some way we did not find.</li>
 </ol>
-<p>Reading 2 is the most likely. The train-instance rate of 1 in 4 fits a weaker
-model, not a model that scores 1.00 on held-out data.</p>
+<p>We checked reading 2. The evidence does not support it.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Checkpoint built 2025-12-30</td>
+<td>Between the Dec 06 release and the Jan 03 release of the Q 0.345 model</td>
+</tr>
+<tr>
+<td>Model card text</td>
+<td>"the latest model weights of Team Comet"</td>
+</tr>
+<tr>
+<td>Directory name <code>pi05-b1kpt50-cs32</code></td>
+<td>Matches the pre-training config name</td>
+</tr>
+<tr>
+<td>README model zoo text</td>
+<td>"base VLA model checkpoints ... ideal for fine-tuning"</td>
+</tr>
+</tbody>
+</table></div>
+<p>The build date and the model card point to the Q 0.345 model. The directory name
+and the model-zoo text point to the pre-training model. The README calls the same
+files both things. We cannot settle this from the public record.</p>
+<p>Reading 3 is limited by the control. The policy succeeds on training instances at
+native resolution. A dead harness cannot do that.</p>
 <h2 id="what-we-cannot-test">What we cannot test</h2>
 <p>Table 3 row #4 compares the two resolutions.</p>
 <div class="tw"><table>

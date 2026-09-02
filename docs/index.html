@@ -149,6 +149,13 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 </tr>
 </tbody>
 </table></div>
+<p>Every setting is the one the report favours.</p>
+<ul>
+<li>Receding horizon is the best control mode in Table 3 row #1. It gives 0.25 there. The other two modes give 0.00.</li>
+<li><code>max_len=32</code> matches the checkpoint. <code>pi05-b1kpt50-cs32</code> predicts 32 actions per chunk.</li>
+<li>Native resolution is the better setting in Table 3 row #4. It gives 0.60 against 0.30 for 224x224.</li>
+<li><code>turning_on_radio</code> is the task the report scores at 1.00.</li>
+</ul>
 <p>The report used 10 instances. The public file supplies 20. We use all 20. This makes the confidence interval half as wide.</p>
 <h2 id="result">Result</h2>
 <div class="tw"><table>

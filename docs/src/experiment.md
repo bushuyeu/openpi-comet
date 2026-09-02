@@ -45,6 +45,13 @@ Figure 4 shows the post-training model at Q 0.345.
 | Resolution | Native. Head 720x720, wrist 480x480 |
 | Instances | 20 public test instances |
 
+Every setting is the one the report favours.
+
+- Receding horizon is the best control mode in Table 3 row #1. It gives 0.25 there. The other two modes give 0.00.
+- `max_len=32` matches the checkpoint. `pi05-b1kpt50-cs32` predicts 32 actions per chunk.
+- Native resolution is the better setting in Table 3 row #4. It gives 0.60 against 0.30 for 224x224.
+- `turning_on_radio` is the task the report scores at 1.00.
+
 The report used 10 instances. The public file supplies 20. We use all 20. This makes the confidence interval half as wide.
 
 ## Result

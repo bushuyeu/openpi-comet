@@ -41,69 +41,140 @@ hr{border:0;border-top:1px solid var(--rule);margin:36px 0}
 footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--rule);
 font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 @media(max-width:640px){body{font-size:16px}.wrap{padding:0 16px 70px}.nav a.ext{margin-left:0}}
-</style></head><body><div class="wrap"><nav class="nav"><a href="index.html">The experiment</a><a href="rft-dataset.html" class="on">RFT dataset</a><a href="compute.html">Hardware</a><a class="ext" href="https://github.com/bushuyeu/openpi-comet">repo &#8599;</a></nav><h1 id="e4-what-the-released-rft-dataset-says-zero-compute">E4 — What the released RFT dataset says (zero compute)</h1>
-<p>Source: <code>delinqu/comet-1.5k</code> <code>meta/episodes.jsonl</code> + <code>meta/info.json</code>, 1469 episodes, 39 tasks.
-Ran before any GPU work, because the paper's post-training claim is the one we cannot afford
-to re-run — but the artifact it produced is public.</p>
-<h2 id="hypothesis">Hypothesis</h2>
-<p>The paper attributes the jump from Q=0.224 (challenge) to Q=0.345 (post-challenge) to a
-refined <strong>"task balancing" strategy</strong> applied when selecting 1469 trajectories out of
-~25,500 rollouts (3 rounds × ~8500). If balancing is what mattered, the kept set should look
-<em>more uniform</em> across tasks than the raw success distribution.</p>
-<h2 id="observations">Observations</h2>
-<p><strong>1. Confirmed: 1469 episodes.</strong> Matches §4.3 exactly. Good provenance signal.</p>
-<p><strong>2. "Task balancing" is a cap, not a rebalance.</strong> Per-task episode counts:</p>
-<pre><code>120 120 120 120 120 118 111 109 65 58 50 44 37 32 31 30 26 24 14 12 11 11 10 9 8 8 8 7 7 6 6 4 4 2 2 2 1 1 1
-</code></pre>
-<p>Five tasks sit at exactly <strong>120</strong>, with three more just under. That flat ceiling is the
-balancing — over-represented tasks are <strong>capped</strong>, rare tasks are not lifted. The result is
-still <strong>120:1 skewed</strong>; the top 5 tasks hold <strong>40.8%</strong> of the data, and the median task
-contributes 12 episodes.</p>
-<p><strong>3. RFT yield collapses with task horizon.</strong> Spearman ρ(episodes kept, mean episode length)
-= <strong>−0.45</strong> across 39 tasks:</p>
+</style></head><body><div class="wrap"><nav class="nav"><a href="index.html">The experiment</a><a href="rft-dataset.html" class="on">RFT dataset</a><a href="compute.html">Hardware</a><a class="ext" href="https://github.com/bushuyeu/openpi-comet">repo &#8599;</a></nav><h1 id="the-rft-dataset">The RFT dataset</h1>
+<p>The report says a refined task-balancing strategy raised its score. We can check
+this without a GPU, because the dataset is public.</p>
+<p>Source: <code>delinqu/comet-1.5k</code>, file <code>meta/episodes.jsonl</code>. 1469 episodes, 39 tasks.</p>
+<h2 id="the-claim">The claim</h2>
 <div class="tw"><table>
 <thead>
 <tr>
-<th>Kept episodes</th>
-<th>Tasks</th>
-<th>Mean horizon</th>
+<th>Stage</th>
+<th>Q-score</th>
+<th>Source</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>≥ 100</td>
+<td>Pre-training</td>
+<td>0.192</td>
+<td>Table 2</td>
+</tr>
+<tr>
+<td>Post-training, at the challenge</td>
+<td>0.224</td>
+<td>Section 4.3</td>
+</tr>
+<tr>
+<td>Post-training, refined</td>
+<td><strong>0.345</strong></td>
+<td>Table 2</td>
+</tr>
+<tr>
+<td>Theoretical best</td>
+<td>0.611</td>
+<td>Table 2</td>
+</tr>
+</tbody>
+</table></div>
+<p>The method keeps 1469 trajectories out of about 25,500 rollouts. That is 3 rounds
+of about 8500 each. If balancing raised the score, the kept set must be more even
+than the raw success distribution.</p>
+<h2 id="finding-1-the-balancing-is-a-cap">Finding 1: the balancing is a cap</h2>
+<p>Episodes kept per task, sorted:</p>
+<pre><code>120 120 120 120 120 118 111 109 65 58 50 44 37 32 31 30 26 24 14
+ 12  11  11  10   9   8   8   8   7  7  6  6  4  4  2  2  2  1  1  1
+</code></pre>
+<p>Five tasks stop at exactly 120. The method caps the common tasks. It does not
+raise the rare ones.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Measure</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ratio of most to least</td>
+<td>120 to 1</td>
+</tr>
+<tr>
+<td>Share held by the top 5 tasks</td>
+<td>40.8%</td>
+</tr>
+<tr>
+<td>Median task</td>
+<td>12 episodes</td>
+</tr>
+</tbody>
+</table></div>
+<p>The set is still very uneven after balancing.</p>
+<h2 id="finding-2-short-tasks-give-more-data">Finding 2: short tasks give more data</h2>
+<p>Spearman rank correlation between episodes kept and episode length: <strong>-0.45</strong>.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Episodes kept</th>
+<th>Tasks</th>
+<th>Mean length</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100 or more</td>
 <td>8</td>
 <td>7,457 frames (4.1 min)</td>
 </tr>
 <tr>
-<td>10–99</td>
+<td>10 to 99</td>
 <td>15</td>
 <td>16,563 frames (9.2 min)</td>
 </tr>
 <tr>
-<td>&lt; 10</td>
+<td>Fewer than 10</td>
 <td>16</td>
 <td>16,212 frames (9.0 min)</td>
 </tr>
 </tbody>
 </table></div>
-<p>Rejection sampling harvests almost entirely from the <em>short</em> half of the benchmark. This is
-the paper's own admission — "the sampling efficiency is still too low" — made quantitative.
-It also explains the shape of Fig 4: the tasks that survive post-training are the tasks RFT
-could feed.</p>
-<p><strong>4. Eleven of fifty tasks yielded nothing.</strong> 39 tasks appear; ~25,500 rollouts produced zero
-retained successes on the other 11. RFT is silent exactly where the benchmark is hardest, so
-it cannot by construction close the gap to the 0.611 "theoretical best" the paper reports.</p>
-<p><strong>5. Native resolution is 720 (head) / 480 (wrist)</strong> — exactly the "high resolution" row of
-Table 3. So that ablation's 0.30 → 0.60 gain is not from adding information; it is from
-<strong>ceasing to throw away</strong> the data's native fidelity by downsampling to 224. Reframes the
-paper's "high-fidelity perception is essential" conclusion as "don't downsample your data."</p>
-<p><strong>6. Minor integrity note.</strong> <code>info.json</code> reports <code>total_frames: 12,226,350</code>; summing episode
-lengths in <code>episodes.jsonl</code> gives <strong>14,896,614</strong> (Δ = 2.67 M, 18%). Likely a stale count not
-regenerated after final filtering. Flagged, not load-bearing.</p>
-<h2 id="insight">Insight</h2>
-<p>The headline improvement is credited to "task balancing," but the released artifact shows
-balancing did comparatively little — the distribution stays extremely skewed. What the data
-actually shows is a <strong>horizon-dependent sampling bias</strong>: RFT works where episodes are short.
-That is a sharper and more actionable statement of the method's limitation than the paper
-makes, and it predicts where E1's per-task numbers should fall.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>
+<p>Rejection sampling collects almost all of its data from the short half of the
+benchmark.</p>
+<h2 id="finding-3-eleven-tasks-gave-nothing">Finding 3: eleven tasks gave nothing</h2>
+<p>The dataset holds 39 tasks. The benchmark has 50. About 25,500 rollouts produced
+no kept episode for the other 11.</p>
+<p>The method is silent where the benchmark is hardest. It cannot close the gap to
+the theoretical best of 0.611.</p>
+<h2 id="finding-4-the-native-resolution-is-720-and-480">Finding 4: the native resolution is 720 and 480</h2>
+<p>The dataset records the head camera at 720x720 and the wrist cameras at 480x480.
+These are the values in row #4 of Table 3.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Image resolution</th>
+<th>Report</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Head 224, wrist 224</td>
+<td>0.30</td>
+</tr>
+<tr>
+<td>Head 720, wrist 480</td>
+<td><strong>0.60</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>So the gain does not come from added information. It comes from not discarding
+information. The 224x224 setting downsamples data that is native at 720 and 480.</p>
+<h2 id="finding-5-a-stale-frame-count">Finding 5: a stale frame count</h2>
+<p><code>info.json</code> gives <code>total_frames</code> as 12,226,350. The sum of the episode lengths in
+<code>episodes.jsonl</code> is 14,896,614. The difference is 2.67 million frames, or 18%.</p>
+<p>The count was likely not rebuilt after the last filter step. This is a note, not a
+problem for the results.</p>
+<h2 id="what-this-means">What this means</h2>
+<p>The report credits task balancing. The dataset shows the balancing does little.
+The distribution stays very uneven.</p>
+<p>The real pattern is a bias by task length. Rejection sampling works where episodes
+are short. This is a sharper limit than the report states.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>

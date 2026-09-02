@@ -47,6 +47,69 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 <p>Figure 4 of the report gives a success rate of <strong>1.00</strong> for the task
 <code>turning_on_radio</code>. The report also uses this task for every cell of Table 3 and
 Table 4.</p>
+<p>Figure 4 reports 25 tasks with a non-zero rate, out of 50. The spread:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Success rate</th>
+<th>Number of tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1.00</strong></td>
+<td><strong>8</strong> (includes <code>turning_on_radio</code>)</td>
+</tr>
+<tr>
+<td>0.80</td>
+<td>2</td>
+</tr>
+<tr>
+<td>0.60, 0.50</td>
+<td>1 each</td>
+</tr>
+<tr>
+<td>0.40, 0.30</td>
+<td>2 each</td>
+</tr>
+<tr>
+<td>0.20</td>
+<td>4</td>
+</tr>
+<tr>
+<td>0.10</td>
+<td>5</td>
+</tr>
+<tr>
+<td>0.00</td>
+<td>25 (not plotted)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Table 2 gives the Q-scores for the whole benchmark.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Q-score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pre-training</td>
+<td>0.192</td>
+</tr>
+<tr>
+<td>Post-training</td>
+<td><strong>0.345</strong></td>
+</tr>
+<tr>
+<td>Theoretical best</td>
+<td>0.611</td>
+</tr>
+</tbody>
+</table></div>
+<p>Figure 4 shows the post-training model at Q 0.345.</p>
 <h2 id="why-this-task">Why this task</h2>
 <ul>
 <li>The authors chose it. Their own ablations run on it.</li>
@@ -164,8 +227,26 @@ reported a false result about the authors' work.</p>
 <p>Reading 2 is the most likely. The train-instance rate of 1 in 4 fits a weaker
 model, not a model that scores 1.00 on held-out data.</p>
 <h2 id="what-we-cannot-test">What we cannot test</h2>
-<p>Table 3 compares 224x224 against native resolution and reports 0.30 against 0.60.
-We cannot repeat this for two reasons.</p>
+<p>Table 3 row #4 compares the two resolutions.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Image resolution</th>
+<th>Report</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Head 224, wrist 224</td>
+<td>0.30</td>
+</tr>
+<tr>
+<td>Head 720, wrist 480</td>
+<td><strong>0.60</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>We cannot repeat this for two reasons.</p>
 <ol>
 <li>The 224x224 models are not public.</li>
 <li>At 10 instances the two intervals overlap. At 20 they still overlap. The
@@ -188,8 +269,30 @@ We cannot repeat this for two reasons.</p>
 this benchmark. An RTX 5090 has RT Cores but gives a segmentation fault, because
 BEHAVIOR-1K v3.7.2 pins torch cu124, which does not support sm_120.</p>
 <h2 id="still-running">Still running</h2>
-<p>The control-mode arm of Table 3 runs now. The report gives 0.00 for temporal
-ensemble and 0.00 for receding temporal.</p>
+<p>The control-mode arm of Table 3 runs now. Table 3 row #1, all on
+<code>turning_on_radio</code> at 224x224:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Control mode</th>
+<th>Report</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Temporal ensemble</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Receding temporal</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Receding horizon</td>
+<td>0.25</td>
+</tr>
+</tbody>
+</table></div>
 <p>A warning about those two results. This policy gives 0.00 in every condition we
 tested. If the two control modes also give 0.00, they agree with the report. That
 agreement means little. A policy that always fails matches every prediction of

@@ -1,0 +1,109 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RFT dataset forensics &middot; Openpi Comet reproduction</title><style>
+:root{--ground:#FCFCFD;--surface:#F2F3F6;--surface-2:#E9EBF0;--ink:#14161B;--ink-mid:#3D434F;
+--ink-mute:#5A606E;--rule:#DCDFE6;--rule-soft:#E8EAEF;--accent:#A85C08;--pass:#15654A;
+--pass-bg:#DCEFE6;--fail:#8E2620;--fail-bg:#F6E1DF;
+--sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+--serif:ui-serif,"Iowan Old Style",Georgia,"Times New Roman",serif;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#0E1014;--surface:#161920;
+--surface-2:#1E222B;--ink:#E9EBF1;--ink-mid:#BFC5D2;--ink-mute:#939AAA;--rule:#272C36;
+--rule-soft:#1E222B;--accent:#E0A040;--pass:#5DC79C;--pass-bg:#122C23;--fail:#E9827A;--fail-bg:#341A18}}
+:root[data-theme="dark"]{--ground:#0E1014;--surface:#161920;--surface-2:#1E222B;--ink:#E9EBF1;
+--ink-mid:#BFC5D2;--ink-mute:#939AAA;--rule:#272C36;--rule-soft:#1E222B;--accent:#E0A040;
+--pass:#5DC79C;--pass-bg:#122C23;--fail:#E9827A;--fail-bg:#341A18}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--serif);
+font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:80ch;margin:0 auto;padding:0 26px 100px}
+h1,h2,h3,h4,.nav{font-family:var(--sans)}
+h1{font-size:2.1rem;line-height:1.1;letter-spacing:-.03em;font-weight:800;margin:8px 0 4px;text-wrap:balance}
+h2{font-size:1.45rem;line-height:1.15;letter-spacing:-.02em;font-weight:750;margin:44px 0 2px;text-wrap:balance}
+h3{font-size:1.1rem;font-weight:700;margin:30px 0 2px}
+p,ul,ol{margin:14px 0}
+a{color:var(--accent)}
+strong{font-weight:640}
+code{font-family:var(--mono);font-size:.87em;background:var(--surface-2);padding:.1em .38em;border-radius:3px}
+pre{background:var(--surface-2);padding:13px 15px;border-radius:6px;overflow-x:auto}
+pre code{background:none;padding:0;font-size:.82rem;line-height:1.5}
+blockquote{margin:16px 0;padding:2px 0 2px 18px;border-left:3px solid var(--accent);color:var(--ink-mid)}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.87rem;margin:6px 0}
+th{text-align:left;font-size:.71rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute);
+padding:11px 14px;border-bottom:1px solid var(--rule);background:var(--surface-2);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top;font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--surface);margin:14px 0}
+.nav{display:flex;flex-wrap:wrap;gap:6px 18px;padding:22px 0 18px;margin-bottom:26px;
+border-bottom:1px solid var(--rule);font-size:.83rem}
+.nav a{color:var(--ink-mute);text-decoration:none;font-weight:600}
+.nav a:hover{color:var(--accent)}
+.nav a.on{color:var(--accent)}
+.nav a.ext{margin-left:auto;color:var(--ink-mute)}
+hr{border:0;border-top:1px solid var(--rule);margin:36px 0}
+footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--rule);
+font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
+@media(max-width:640px){body{font-size:16px}.wrap{padding:0 16px 70px}.nav a.ext{margin-left:0}}
+</style></head><body><div class="wrap"><nav class="nav"><a href="index.html">Reproduction report</a><a href="experiment-design.html">Experiment design</a><a href="rft-dataset.html" class="on">RFT dataset forensics</a><a href="compute.html">Compute assessment</a><a class="ext" href="https://github.com/bushuyeu/openpi-comet">repo &#8599;</a></nav><h1 id="e4-what-the-released-rft-dataset-says-zero-compute">E4 — What the released RFT dataset says (zero compute)</h1>
+<p>Source: <code>delinqu/comet-1.5k</code> <code>meta/episodes.jsonl</code> + <code>meta/info.json</code>, 1469 episodes, 39 tasks.
+Ran before any GPU work, because the paper's post-training claim is the one we cannot afford
+to re-run — but the artifact it produced is public.</p>
+<h2 id="hypothesis">Hypothesis</h2>
+<p>The paper attributes the jump from Q=0.224 (challenge) to Q=0.345 (post-challenge) to a
+refined <strong>"task balancing" strategy</strong> applied when selecting 1469 trajectories out of
+~25,500 rollouts (3 rounds × ~8500). If balancing is what mattered, the kept set should look
+<em>more uniform</em> across tasks than the raw success distribution.</p>
+<h2 id="observations">Observations</h2>
+<p><strong>1. Confirmed: 1469 episodes.</strong> Matches §4.3 exactly. Good provenance signal.</p>
+<p><strong>2. "Task balancing" is a cap, not a rebalance.</strong> Per-task episode counts:</p>
+<pre><code>120 120 120 120 120 118 111 109 65 58 50 44 37 32 31 30 26 24 14 12 11 11 10 9 8 8 8 7 7 6 6 4 4 2 2 2 1 1 1
+</code></pre>
+<p>Five tasks sit at exactly <strong>120</strong>, with three more just under. That flat ceiling is the
+balancing — over-represented tasks are <strong>capped</strong>, rare tasks are not lifted. The result is
+still <strong>120:1 skewed</strong>; the top 5 tasks hold <strong>40.8%</strong> of the data, and the median task
+contributes 12 episodes.</p>
+<p><strong>3. RFT yield collapses with task horizon.</strong> Spearman ρ(episodes kept, mean episode length)
+= <strong>−0.45</strong> across 39 tasks:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kept episodes</th>
+<th>Tasks</th>
+<th>Mean horizon</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>≥ 100</td>
+<td>8</td>
+<td>7,457 frames (4.1 min)</td>
+</tr>
+<tr>
+<td>10–99</td>
+<td>15</td>
+<td>16,563 frames (9.2 min)</td>
+</tr>
+<tr>
+<td>&lt; 10</td>
+<td>16</td>
+<td>16,212 frames (9.0 min)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Rejection sampling harvests almost entirely from the <em>short</em> half of the benchmark. This is
+the paper's own admission — "the sampling efficiency is still too low" — made quantitative.
+It also explains the shape of Fig 4: the tasks that survive post-training are the tasks RFT
+could feed.</p>
+<p><strong>4. Eleven of fifty tasks yielded nothing.</strong> 39 tasks appear; ~25,500 rollouts produced zero
+retained successes on the other 11. RFT is silent exactly where the benchmark is hardest, so
+it cannot by construction close the gap to the 0.611 "theoretical best" the paper reports.</p>
+<p><strong>5. Native resolution is 720 (head) / 480 (wrist)</strong> — exactly the "high resolution" row of
+Table 3. So that ablation's 0.30 → 0.60 gain is not from adding information; it is from
+<strong>ceasing to throw away</strong> the data's native fidelity by downsampling to 224. Reframes the
+paper's "high-fidelity perception is essential" conclusion as "don't downsample your data."</p>
+<p><strong>6. Minor integrity note.</strong> <code>info.json</code> reports <code>total_frames: 12,226,350</code>; summing episode
+lengths in <code>episodes.jsonl</code> gives <strong>14,896,614</strong> (Δ = 2.67 M, 18%). Likely a stale count not
+regenerated after final filtering. Flagged, not load-bearing.</p>
+<h2 id="insight">Insight</h2>
+<p>The headline improvement is credited to "task balancing," but the released artifact shows
+balancing did comparatively little — the distribution stays extremely skewed. What the data
+actually shows is a <strong>horizon-dependent sampling bias</strong>: RFT works where episodes are short.
+That is a sharper and more actionable statement of the method's limitation than the paper
+makes, and it predicts where E1's per-task numbers should fall.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>

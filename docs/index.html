@@ -1,0 +1,609 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
+:root{--ground:#FCFCFD;--surface:#F2F3F6;--surface-2:#E9EBF0;--ink:#14161B;--ink-mid:#3D434F;
+--ink-mute:#5A606E;--rule:#DCDFE6;--rule-soft:#E8EAEF;--accent:#A85C08;--pass:#15654A;
+--pass-bg:#DCEFE6;--fail:#8E2620;--fail-bg:#F6E1DF;
+--sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+--serif:ui-serif,"Iowan Old Style",Georgia,"Times New Roman",serif;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#0E1014;--surface:#161920;
+--surface-2:#1E222B;--ink:#E9EBF1;--ink-mid:#BFC5D2;--ink-mute:#939AAA;--rule:#272C36;
+--rule-soft:#1E222B;--accent:#E0A040;--pass:#5DC79C;--pass-bg:#122C23;--fail:#E9827A;--fail-bg:#341A18}}
+:root[data-theme="dark"]{--ground:#0E1014;--surface:#161920;--surface-2:#1E222B;--ink:#E9EBF1;
+--ink-mid:#BFC5D2;--ink-mute:#939AAA;--rule:#272C36;--rule-soft:#1E222B;--accent:#E0A040;
+--pass:#5DC79C;--pass-bg:#122C23;--fail:#E9827A;--fail-bg:#341A18}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--serif);
+font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:80ch;margin:0 auto;padding:0 26px 100px}
+h1,h2,h3,h4,.nav{font-family:var(--sans)}
+h1{font-size:2.1rem;line-height:1.1;letter-spacing:-.03em;font-weight:800;margin:8px 0 4px;text-wrap:balance}
+h2{font-size:1.45rem;line-height:1.15;letter-spacing:-.02em;font-weight:750;margin:44px 0 2px;text-wrap:balance}
+h3{font-size:1.1rem;font-weight:700;margin:30px 0 2px}
+p,ul,ol{margin:14px 0}
+a{color:var(--accent)}
+strong{font-weight:640}
+code{font-family:var(--mono);font-size:.87em;background:var(--surface-2);padding:.1em .38em;border-radius:3px}
+pre{background:var(--surface-2);padding:13px 15px;border-radius:6px;overflow-x:auto}
+pre code{background:none;padding:0;font-size:.82rem;line-height:1.5}
+blockquote{margin:16px 0;padding:2px 0 2px 18px;border-left:3px solid var(--accent);color:var(--ink-mid)}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.87rem;margin:6px 0}
+th{text-align:left;font-size:.71rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute);
+padding:11px 14px;border-bottom:1px solid var(--rule);background:var(--surface-2);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top;font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--surface);margin:14px 0}
+.nav{display:flex;flex-wrap:wrap;gap:6px 18px;padding:22px 0 18px;margin-bottom:26px;
+border-bottom:1px solid var(--rule);font-size:.83rem}
+.nav a{color:var(--ink-mute);text-decoration:none;font-weight:600}
+.nav a:hover{color:var(--accent)}
+.nav a.on{color:var(--accent)}
+.nav a.ext{margin-left:auto;color:var(--ink-mute)}
+hr{border:0;border-top:1px solid var(--rule);margin:36px 0}
+footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--rule);
+font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
+@media(max-width:640px){body{font-size:16px}.wrap{padding:0 16px 70px}.nav a.ext{margin-left:0}}
+.nav{max-width:1180px;margin:0 auto 26px}</style></head><body><title>Openpi Comet Reproduction</title>
+<style>
+:root{
+  --ground:#FCFCFD; --surface:#F2F3F6; --surface-2:#E9EBF0;
+  --ink:#14161B; --ink-mid:#3D434F; --ink-mute:#5A606E;
+  --rule:#DCDFE6; --rule-soft:#E8EAEF;
+  --accent:#A85C08; --accent-soft:#F5E6D0;
+  --pass:#15654A; --pass-bg:#DCEFE6;
+  --fail:#8E2620; --fail-bg:#F6E1DF;
+  --warn:#7A5A10; --warn-bg:#F6EBD4;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --serif:ui-serif,"Iowan Old Style","Source Serif Pro",Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1014; --surface:#161920; --surface-2:#1E222B;
+    --ink:#E9EBF1; --ink-mid:#BFC5D2; --ink-mute:#939AAA;
+    --rule:#272C36; --rule-soft:#1E222B;
+    --accent:#E0A040; --accent-soft:#3A2C14;
+    --pass:#5DC79C; --pass-bg:#122C23;
+    --fail:#E9827A; --fail-bg:#341A18;
+    --warn:#D9B564; --warn-bg:#2E2614;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1014; --surface:#161920; --surface-2:#1E222B;
+  --ink:#E9EBF1; --ink-mid:#BFC5D2; --ink-mute:#939AAA;
+  --rule:#272C36; --rule-soft:#1E222B;
+  --accent:#E0A040; --accent-soft:#3A2C14;
+  --pass:#5DC79C; --pass-bg:#122C23;
+  --fail:#E9827A; --fail-bg:#341A18;
+  --warn:#D9B564; --warn-bg:#2E2614;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--serif); font-size:17px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px 120px}
+.col{max-width:68ch}
+h1,h2,h3,h4,.eyebrow,.chip,th,.mono{font-family:var(--sans)}
+h1{font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.04;letter-spacing:-.033em;font-weight:800;margin:0;text-wrap:balance}
+h2{font-size:clamp(1.5rem,3vw,2.05rem);line-height:1.12;letter-spacing:-.024em;font-weight:750;margin:0;text-wrap:balance}
+h3{font-size:1.14rem;line-height:1.25;letter-spacing:-.012em;font-weight:700;margin:0;text-wrap:balance}
+h4{font-size:.83rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-mute);margin:0}
+p{margin:0}
+a{color:var(--accent)}
+strong{font-weight:640;color:var(--ink)}
+code,.mono{font-family:var(--mono);font-size:.87em;font-variant-numeric:tabular-nums}
+code{background:var(--surface-2);padding:.1em .38em;border-radius:3px}
+
+/* ---- masthead ---- */
+header.top{padding:76px 0 0}
+.eyebrow{font-size:.76rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+.sub{font-family:var(--serif);font-size:1.22rem;line-height:1.5;color:var(--ink-mid);margin-top:22px;max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:0 34px;margin-top:34px;padding-top:22px;border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:.78rem;color:var(--ink-mute)}
+.meta b{display:block;font-weight:400;color:var(--ink-mute);opacity:.72;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px}
+.meta span{color:var(--ink);font-weight:500}
+
+/* ---- sections ---- */
+section{margin-top:82px;scroll-margin-top:20px}
+.shead{display:flex;align-items:baseline;gap:16px;margin-bottom:8px}
+.tag{font-family:var(--mono);font-size:.8rem;font-weight:600;color:var(--accent);
+  border:1px solid var(--accent);border-radius:3px;padding:2px 8px;flex:none;letter-spacing:.02em}
+.stack{display:flex;flex-direction:column;gap:19px}
+.stack.tight{gap:13px}
+.lede{font-size:1.1rem;color:var(--ink-mid)}
+
+/* ---- callout ---- */
+.callout{background:var(--surface);border-left:3px solid var(--accent);padding:20px 24px;border-radius:0 5px 5px 0;display:flex;flex-direction:column;gap:11px}
+.callout.q{border-left-color:var(--ink-mute)}
+.callout blockquote{margin:0;font-style:italic;color:var(--ink-mid)}
+
+/* ---- tables ---- */
+.tw{overflow-x:auto;margin:4px 0;border:1px solid var(--rule);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.87rem}
+th{text-align:left;font-weight:700;font-size:.71rem;letter-spacing:.085em;text-transform:uppercase;
+  color:var(--ink-mute);padding:12px 16px;border-bottom:1px solid var(--rule);white-space:nowrap;background:var(--surface-2)}
+td{padding:11px 16px;border-bottom:1px solid var(--rule-soft);vertical-align:top;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+td.num{text-align:right;font-family:var(--mono)}
+.chip{display:inline-block;font-size:.71rem;font-weight:700;letter-spacing:.045em;padding:2.5px 9px;border-radius:99px;white-space:nowrap}
+.chip.y{background:var(--pass-bg);color:var(--pass)}
+.chip.n{background:var(--fail-bg);color:var(--fail)}
+.chip.m{background:var(--warn-bg);color:var(--warn)}
+tr.out td{opacity:.62}
+
+/* ---- distribution bars ---- */
+.dist{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:24px 26px 20px}
+.bars{display:flex;align-items:flex-end;gap:2.5px;height:132px;margin:20px 0 0}
+.bar{flex:1;background:var(--ink-mute);border-radius:1.5px 1.5px 0 0;min-height:2px;opacity:.42}
+.bar.cap{background:var(--accent);opacity:1}
+.axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.7rem;color:var(--ink-mute);margin-top:9px;padding-top:8px;border-top:1px solid var(--rule)}
+.capline{position:relative;height:0}
+.legend{display:flex;gap:20px;font-family:var(--mono);font-size:.72rem;color:var(--ink-mute);margin-top:14px;flex-wrap:wrap}
+.sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:baseline}
+
+/* ---- finding cards ---- */
+.finds{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.find{background:var(--surface);padding:20px 22px;display:flex;flex-direction:column;gap:9px}
+.find .n{font-family:var(--mono);font-size:.72rem;color:var(--accent);font-weight:600}
+.find p{font-size:.92rem;line-height:1.52;color:var(--ink-mid)}
+
+/* ---- predictions ---- */
+.pred{display:flex;gap:15px;align-items:flex-start;padding:15px 0;border-bottom:1px solid var(--rule-soft)}
+.pred:last-child{border-bottom:none}
+.pred .h{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--accent);flex:none;width:34px;padding-top:2px}
+.pred p{font-size:.95rem;color:var(--ink-mid)}
+
+/* ---- status ---- */
+.status{border:1px dashed var(--rule);border-radius:6px;padding:20px 24px;background:transparent;display:flex;flex-direction:column;gap:10px}
+.status .lbl{font-family:var(--mono);font-size:.73rem;letter-spacing:.09em;text-transform:uppercase;color:var(--warn);font-weight:700}
+
+hr.rule{border:0;border-top:1px solid var(--rule);margin:0}
+ul{margin:0;padding-left:1.15em;display:flex;flex-direction:column;gap:9px}
+li{padding-left:.15em}
+li::marker{color:var(--accent)}
+footer{margin-top:96px;padding-top:26px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.76rem;color:var(--ink-mute);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 18px 80px}
+  header.top{padding-top:48px}
+  section{margin-top:60px}
+  .meta{gap:0 22px;row-gap:16px}
+  .bars{height:98px;gap:1.5px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .bar{transition:opacity .2s}
+}
+</style>
+
+<div class="wrap"><nav class="nav"><a href="index.html" class="on">Reproduction report</a><a href="experiment-design.html">Experiment design</a><a href="rft-dataset.html">RFT dataset forensics</a><a href="compute.html">Compute assessment</a><a class="ext" href="https://github.com/bushuyeu/openpi-comet">repo &#8599;</a></nav>
+
+<header class="top">
+  <div class="eyebrow">Empiricist · Paper Review</div>
+  <h1>Openpi&nbsp;Comet:<br>what reproduces, and what stops you</h1>
+  <p class="sub">Team Comet took 2nd place in the 2025 BEHAVIOR Challenge and released everything —
+  code, checkpoints, and their post-training dataset. This is an attempt to re-derive their results,
+  and an account of the hardware constraint that decides who can try.</p>
+  <div class="meta">
+    <div><b>Paper</b><span>arXiv:2512.10071v3</span></div>
+    <div><b>Backbone</b><span>π0.5 (JAX)</span></div>
+    <div><b>Reported</b><span>Q 0.2514 test · 0.345 val</span></div>
+    <div><b>Fork</b><span>bushuyeu/openpi-comet</span></div>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><h2>Price the claims before running anything</h2></div>
+  <div class="stack col">
+    <p class="lede">Reproduction isn't one thing. It's five claims whose costs span four orders of magnitude —
+    and knowing which is which is the first real result.</p>
+  </div>
+  <div class="tw" style="margin-top:26px">
+    <table>
+      <thead><tr><th>Claim</th><th>Their cost</th><th>My cost</th><th>Reachable</th></tr></thead>
+      <tbody>
+        <tr class="out"><td>Pre-training (pt50)</td><td>50k steps, <strong>~40× H200</strong></td><td>—</td><td><span class="chip n">NO</span></td></tr>
+        <tr class="out"><td>RFT post-training</td><td>3 rounds × ~8,500 rollouts</td><td>~3,500+ GPU-hr</td><td><span class="chip n">NO</span></td></tr>
+        <tr><td>Per-task eval of released ckpt</td><td>—</td><td>~30–60 GPU-hr</td><td><span class="chip y">YES</span></td></tr>
+        <tr><td>pt12 vs pt50 comparison</td><td>—</td><td>~30–60 GPU-hr</td><td><span class="chip y">YES</span></td></tr>
+        <tr><td><strong>Table 3 inference ablations</strong></td><td>—</td><td><strong>~10–20 GPU-hr</strong></td><td><span class="chip y">YES</span></td></tr>
+        <tr><td><strong>RFT dataset forensics</strong></td><td>—</td><td><strong>zero</strong></td><td><span class="chip y">FREE</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="stack col" style="margin-top:26px">
+    <p>Two things fall out before any GPU is touched. The <strong>inference-time</strong> ablations are the
+    highest-value target — they're pure runtime flags, so released checkpoints make them testable with no
+    training at all. And the <strong>released RFT dataset</strong> lets me interrogate the post-training
+    claim — the one I categorically cannot re-run — for free.</p>
+    <p>I ran both. The free one finished and produced the sharpest result on this page.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="tag">FINDING</span><h2>The barrier nobody states: RT Cores</h2></div>
+  <div class="stack col">
+    <p class="lede">BEHAVIOR-1K runs on OmniGibson → Isaac Sim. NVIDIA's requirements
+    <strong>explicitly name A100 and H100 as unsupported</strong> — no RT Cores, so they cannot run the
+    raytraced renderer. Volta sits further below the line.</p>
+  </div>
+  <div class="tw" style="margin-top:24px">
+    <table>
+      <thead><tr><th>Architecture</th><th>Example</th><th>RT Cores</th><th>Runs the benchmark</th></tr></thead>
+      <tbody>
+        <tr class="out"><td>Volta</td><td class="mono">V100</td><td>None</td><td><span class="chip n">NO</span></td></tr>
+        <tr class="out"><td>Ampere GA100</td><td class="mono">A100</td><td>None</td><td><span class="chip n">NO</span></td></tr>
+        <tr class="out"><td>Hopper</td><td class="mono">H100 · H200</td><td>None</td><td><span class="chip n">NO</span></td></tr>
+        <tr><td>Ampere GA102</td><td class="mono">A40 · A10 · RTX 3090</td><td>Yes</td><td><span class="chip y">YES</span></td></tr>
+        <tr><td>Ada</td><td class="mono">L40S · RTX 4090</td><td>Yes</td><td><span class="chip y">YES</span></td></tr>
+        <tr><td>Blackwell</td><td class="mono">RTX 5090 · RTX PRO 6000</td><td>Yes</td><td><span class="chip y">YES</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="stack col" style="margin-top:30px">
+    <h3>This inverts the usual ranking</h3>
+    <p>The authors trained on H200s — but you cannot <em>evaluate</em> on an H200. Applied to the compute
+    I actually have, the two best-specced machines are the two that can't do the job. Roughly 350&nbsp;GB
+    of aggregate VRAM turned out to be worthless for this task.</p>
+  </div>
+  <div class="tw" style="margin-top:22px">
+    <table>
+      <thead><tr><th>Resource</th><th>GPU</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td>b3iq</td><td class="mono">RTX 5090 · 32 GB</td><td><span class="chip m">TOO NEW</span></td></tr>
+        <tr><td>NCSA Delta <code>gpuA40x4</code></td><td class="mono">4× A40 · 48 GB</td><td><span class="chip m">NO ALLOCATION</span></td></tr>
+        <tr class="out"><td>NCSA DeltaAI</td><td class="mono">GH200</td><td><span class="chip n">RULED OUT</span></td></tr>
+        <tr class="out"><td>UHCC DGX</td><td class="mono">8× V100 · 256 GB total</td><td><span class="chip n">RULED OUT</span></td></tr>
+        <tr class="out"><td>Jetstream2</td><td class="mono">A100 vGPU slice</td><td><span class="chip n">RULED OUT</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="stack col" style="margin-top:34px">
+    <h3>Why this is a finding, not a footnote</h3>
+    <p>It <strong>explains a design decision in the paper.</strong> §4.3 rejects online RL partly because it
+    needs a heterogeneous setup — RT Cores for simulation, Tensor Cores for training. The authors are
+    describing this exact constraint.</p>
+  </div>
+  <div class="callout q col" style="margin-top:18px">
+    <blockquote>"online RL requires a heterogeneous compute setup: GPUs with RT Cores are needed for
+    simulation, while GPUs with Tensor Cores are needed for model training and rollouts."</blockquote>
+    <p style="font-size:.88rem;color:var(--ink-mute);font-family:var(--sans)">— Openpi Comet, §4.3</p>
+  </div>
+  <div class="stack col" style="margin-top:22px">
+    <p>Read that way, RFT isn't only a sample-efficiency choice. It's a choice that <strong>decouples training
+    and simulation in time</strong>, so you never need both GPU classes at once. That's the most transferable
+    idea in the report, and it sits in one sentence.</p>
+    <p>And the constraint is <strong>structural</strong>. Checking the ACCESS-CI catalog: Delta's A40 nodes are
+    the only clearly RT-capable GPUs in the entire inventory. DeltaAI, Vista, Lonestar6, Bridges-2, Expanse,
+    Anvil, ACES — none can render a frame of this benchmark. The national GPU buildout optimised for
+    tensor-core throughput, and embodied-AI simulation fell outside it.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="tag">E4</span><h2>What the released RFT dataset says</h2></div>
+  <div class="stack col">
+    <p class="lede">Executed. Zero compute. The one experiment I could run against the claim I could never re-run.</p>
+    <h4 style="margin-top:12px">Hypothesis</h4>
+    <p>The paper attributes its 0.224 → 0.345 improvement to a refined <strong>"task balancing"</strong> strategy
+    when selecting 1,469 trajectories from ~25,500 rollouts. If balancing drove the gain, the kept set should
+    be <em>more uniform</em> across tasks than raw rejection sampling would produce.</p>
+    <h4 style="margin-top:12px">Method</h4>
+    <p>Pulled <code>meta/episodes.jsonl</code> from <code>delinqu/comet-1.5k</code>; computed per-task episode
+    counts, per-task mean horizon, and the rank correlation between them.</p>
+  </div>
+
+  <div class="dist" style="margin-top:30px">
+    <h4>Episodes retained per task, sorted — 39 tasks</h4>
+    <div class="bars" id="bars"></div>
+    <div class="axis"><span>most-sampled task</span><span>39 tasks</span><span>least-sampled</span></div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--accent)"></span>at the 120-episode cap</span>
+      <span><span class="sw" style="background:var(--ink-mute);opacity:.42"></span>below the cap</span>
+      <span>median task = 12 episodes · max/min = 120×</span>
+    </div>
+  </div>
+
+  <div class="stack col" style="margin-top:30px">
+    <h3>"Task balancing" is a cap, not a rebalance</h3>
+    <p>Five tasks sit at exactly <strong>120</strong> — a flat ceiling. Over-represented tasks get
+    <strong>capped</strong>; rare tasks are <strong>not lifted</strong>. The distribution stays
+    <strong>120:1 skewed</strong>, the top five tasks hold <strong>40.8%</strong> of the data, and the median
+    task contributes twelve episodes.</p>
+  </div>
+
+  <div class="finds" style="margin-top:30px">
+    <div class="find"><span class="n">FINDING 02</span><h3>Yield collapses with horizon</h3>
+      <p>Spearman ρ(episodes kept, mean episode length) = <strong>−0.45</strong>. Tasks with ≥100 episodes kept
+      average 4.1 minutes; everything else averages ~9. Rejection sampling harvests almost entirely from the
+      short half of the benchmark.</p></div>
+    <div class="find"><span class="n">FINDING 03</span><h3>Eleven tasks yielded nothing</h3>
+      <p>39 of 50 tasks appear. Roughly 25,500 rollouts produced zero retained successes on the other eleven —
+      RFT is silent exactly where the benchmark is hardest.</p></div>
+    <div class="find"><span class="n">FINDING 04</span><h3>Native resolution is 720 / 480</h3>
+      <p>Head 720×720, wrist 480×480 — <em>exactly</em> Table 3's "high resolution" row. The ablation's 2× gain
+      isn't from adding information.</p></div>
+    <div class="find"><span class="n">FINDING 05</span><h3>A stale frame count</h3>
+      <p><code>info.json</code> reports 12,226,350 frames; summing episode lengths gives 14,896,614 — an 18%
+      gap, likely a count not regenerated after final filtering. Flagged, not load-bearing.</p></div>
+  </div>
+
+  <div class="tw" style="margin-top:28px">
+    <table>
+      <thead><tr><th>Episodes kept</th><th class="num">Tasks</th><th class="num">Mean horizon (frames)</th><th class="num">≈ minutes</th></tr></thead>
+      <tbody>
+        <tr><td>≥ 100</td><td class="num">8</td><td class="num">7,457</td><td class="num">4.1</td></tr>
+        <tr><td>10 – 99</td><td class="num">15</td><td class="num">16,563</td><td class="num">9.2</td></tr>
+        <tr><td>&lt; 10</td><td class="num">16</td><td class="num">16,212</td><td class="num">9.0</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout col" style="margin-top:32px">
+    <h3>Where this diverges from the paper</h3>
+    <p>The paper credits <strong>task balancing</strong>. The artifact shows balancing did comparatively
+    little — the distribution stays extremely skewed after it. What the data actually shows is a
+    <strong>horizon-dependent sampling bias</strong>.</p>
+    <p>That sharpens the paper's own conclusion. It admits "sampling efficiency is still too low." The data
+    says something stronger: RFT cannot close the gap to the reported 0.611 theoretical best
+    <strong>by construction</strong>, because it generates no signal at all on the eleven tasks that need it most.</p>
+  </div>
+
+  <div class="stack col" style="margin-top:26px">
+    <h3>A second reframing</h3>
+    <p>Finding 04 recasts Table 3's resolution result. The 0.30 → 0.60 gain is <strong>not</strong> from adding
+    information — it's from <strong>ceasing to discard</strong> it, since 224×224 downsamples data that is
+    natively 720/480. "High-fidelity perception is essential" is more honestly stated as
+    <strong>"don't downsample your data."</strong></p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="tag">E3</span><h2>The radio probe</h2></div>
+  <div class="stack col">
+    <p class="lede">The paper hands you the ideal test and doesn't take it. Every measurement here
+    is on <code>turning_on_radio</code> — and the choice isn't ours, it's theirs.</p>
+  </div>
+
+  <div class="finds" style="margin-top:26px">
+    <div class="find"><span class="n">WHY THIS TASK</span><h3>It's their own probe</h3>
+      <p>Every cell of <strong>Table 3 and Table 4</strong> was measured on it. Using the same task
+      removes the "different model, different task" confound entirely.</p></div>
+    <div class="find"><span class="n">WHY THIS TASK</span><h3>They claim 100%</h3>
+      <p>Fig 4 reports it at <strong>1.00</strong> and the caption says the policy performs it
+      "robustly". That's an extreme, falsifiable prediction — not a vague directional claim.</p></div>
+    <div class="find"><span class="n">WHY THIS TASK</span><h3>It's the cheapest in the benchmark</h3>
+      <p><strong>934 frames = 31 s</strong>, 2.5× shorter than the next task. Cheapest possible test
+      of the strongest possible claim.</p></div>
+  </div>
+
+  <div class="stack col" style="margin-top:32px">
+    <h3>We can afford twice their sample size</h3>
+    <p>The public instance list holds <strong>20</strong> IDs for this task, but the eval harness
+    defaults to <code>NUM_EVAL_INSTANCES = 10</code>. That's why every number in Fig 4 and Table 3
+    lands on a multiple of 0.1. Because the task is only 31 s, we run all 20 — and report the
+    first-10 subset alongside, so one column stays directly comparable to the paper.</p>
+  </div>
+
+  <div class="tw" style="margin-top:24px">
+    <table>
+      <thead><tr><th>Config</th><th>Tests</th><th>Paper's value</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">A_baseline_rh32_224</td><td>Fig 4 headline</td><td class="num">1.00</td></tr>
+        <tr><td class="mono">B_temporal_ensemble</td><td>Table 3 #1 — control mode</td><td class="num">0.00</td></tr>
+        <tr><td class="mono">C_receding_temporal</td><td>Table 3 #1 — control mode</td><td class="num">0.00</td></tr>
+        <tr><td class="mono">D_native_resolution</td><td>Table 3 #4 — resolution</td><td class="num">0.60</td></tr>
+        <tr><td class="mono">E_maxlen16</td><td>Table 3 #2 (variant)</td><td class="num">—</td></tr>
+        <tr><td class="mono">F_maxlen8</td><td>Table 3 #2 (variant)</td><td class="num">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout col" style="margin-top:32px">
+    <h3>The finding that doesn't need the runs to finish</h3>
+    <p>Computing confidence intervals on the paper's own numbers surfaces something it never states.
+    Their most-quoted ablation — that native resolution <strong>doubles</strong> success, 0.30 → 0.60 —
+    is <strong>not statistically resolvable at their sample size, or at twice their sample size</strong>:</p>
+    <div class="tw" style="margin-top:14px">
+      <table>
+        <thead><tr><th>n</th><th>0.30 → 95% CI</th><th>0.60 → 95% CI</th><th>Separable?</th></tr></thead>
+        <tbody>
+          <tr><td class="num">10 <span style="color:var(--ink-mute)">(theirs)</span></td><td class="mono">[0.11, 0.60]</td><td class="mono">[0.31, 0.83]</td><td><span class="chip n">OVERLAP</span></td></tr>
+          <tr><td class="num">20 <span style="color:var(--ink-mute)">(ours)</span></td><td class="mono">[0.15, 0.52]</td><td class="mono">[0.39, 0.78]</td><td><span class="chip n">OVERLAP</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The same applies to Table 4's null results: "skill weighting yields no improvement" is
+    indistinguishable from "we could not have detected one." Several reported effects in this paper
+    are point estimates from ten trials, presented without intervals.</p>
+  </div>
+
+  <div class="stack col" style="margin-top:28px">
+    <h3>Pre-registered predictions</h3>
+    <p>Committed before running, so they can't be fitted afterwards. <strong>H1</strong> — temporal
+    ensemble and receding temporal collapse toward zero. <strong>H2</strong> — native resolution beats
+    224×224. <strong>H3′</strong> — shorter executed chunks degrade control.</p>
+    <p>I expect <strong>H2 to hold and H1 to weaken.</strong> H2 has independent support from E4's
+    finding 04: if the effect is really "stop downsampling," it should transfer across checkpoints.
+    H1's mechanism is entangled with how a single-task model's action distribution behaves — exactly
+    what multi-task training changes.</p>
+  </div>
+
+  <div class="callout col" style="margin-top:30px">
+    <h3>The first run produced a table that was entirely wrong</h3>
+    <p>Ran at 224×224. Every instance ended at exactly 4300 simulator steps with
+    <code>q_score.final = 0.000</code>:</p>
+    <div class="tw" style="margin-top:14px">
+      <table>
+        <thead><tr><th>Config</th><th>Paper</th><th class="num">n</th><th class="num">ours</th><th>95% CI</th><th>Reading</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">A_baseline_224</td><td class="num">1.00</td><td class="num">20</td><td class="num">0.00</td><td class="mono">[0.00, 0.16]</td><td><span class="chip n">looked like a finding</span></td></tr>
+          <tr><td class="mono">B_temporal_ensemble</td><td class="num">0.00</td><td class="num">14</td><td class="num">0.00</td><td class="mono">[0.00, 0.22]</td><td><span class="chip m">"agreed" with the paper</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>At face value: <em>Fig 4's 100% claim does not reproduce.</em> That would have been a false
+    claim about someone else's work. <strong>Config B is the tell</strong> — it agrees with the
+    paper's 0.00, and that agreement is worthless, because a harness incapable of producing any
+    success returns 0.00 for every configuration, matching every prediction of zero it is tested
+    against.</p>
+  </div>
+
+  <div class="stack col" style="margin-top:30px">
+    <h3>The control that caught it</h3>
+    <p>Running the same policy on <strong>training instances it had already been fitted to</strong>:</p>
+  </div>
+  <pre style="margin:14px 0 0;overflow-x:auto;font-family:var(--mono);font-size:.82rem;color:var(--ink-mid);background:var(--surface-2);padding:12px 14px;border-radius:5px">POSCONTROL (train, 224)     n=6   nonzero=0   meanQ=0.000   -> harness suspect
+DIAGNOSTIC (train, native)  n=4   nonzero=1   meanQ=0.250   -> pipeline discriminates</pre>
+  <div class="stack col" style="margin-top:18px">
+    <p>Zero on data the model was trained on is not a policy failing to generalise — it is a dead
+    instrument. <strong>The cause was mine.</strong> Upstream defaults <code>env_wrapper</code> to
+    <code>RGBWrapper</code> (native 720/480) and the README recommends it for evaluation; I overrode
+    it to 224 so the baseline would match Table 3's row. That reasoning was wrong — Table 3's 224
+    numbers come from a <em>single-task SFT model trained at 224</em>. The released multi-task
+    checkpoint does not degrade at 224, it fails completely.</p>
+    <p><strong>This control was not in the original design.</strong> Any experiment whose predicted
+    outcome is zero cannot separate a confirmed hypothesis from a broken apparatus without one.</p>
+  </div>
+
+  <div class="callout col" style="margin-top:30px">
+    <h3>H2 is unverifiable — for two independent reasons</h3>
+    <p>The resolution arm is dead. The 224 condition cannot be measured on this checkpoint at all,
+    and reproducing Table 3 #4 would need the per-resolution single-task models, which were never
+    released. So the paper's most-quoted ablation — native resolution doubles success, 0.30 → 0.60 —
+    cannot be checked because <strong>(1)</strong> the artifacts do not exist publicly, and
+    <strong>(2)</strong> even with them, the intervals overlap at n=10 and at n=20.</p>
+  </div>
+
+  <div class="status col" style="margin-top:28px">
+    <span class="lbl">● Corrected sweep running</span>
+    <p>Native resolution throughout: baseline, then the two control-mode arms, then the chunk-length
+    variants. Results land in the repo's <code>experiment-design.md</code> §9.5.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="tag">FINDING</span><h2>The version bind</h2></div>
+  <div class="stack col">
+    <p class="lede">Reproducing this paper requires two things that sit on opposite sides of a
+    version boundary. You can have the code, or you can have GPU support — not both.</p>
+  </div>
+  <div class="tw" style="margin-top:24px">
+    <table>
+      <thead><tr><th>Requirement</th><th>BEHAVIOR-1K v3.7.2</th><th>BEHAVIOR-1K 3.9.2</th></tr></thead>
+      <tbody>
+        <tr><td><code>omnigibson.learning</code><br><span style="color:var(--ink-mute);font-size:.85em">the eval code openpi-comet overlays</span></td><td><span class="chip y">PRESENT</span></td><td><span class="chip n">REMOVED</span></td></tr>
+        <tr><td>Isaac Sim</td><td class="mono">4.5 / Kit 106.5</td><td class="mono">5.1</td></tr>
+        <tr><td>torch / CUDA</td><td class="mono">2.6.0 + cu124</td><td class="mono">2.7.0 + cu128</td></tr>
+        <tr><td>Runs on Blackwell (needs ≥ 12.8)</td><td><span class="chip n">NO</span></td><td><span class="chip y">YES</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout col" style="margin-top:26px">
+    <h3>Isolating the cause — three hypotheses, two eliminated</h3>
+    <p>The first version of this page claimed a measured Blackwell incompatibility. That claim was
+    premature: I attributed a crash to GPU architecture before ruling out the environment, and
+    <em>both</em> machines were failing for a shared reason that had nothing to do with GPUs. The
+    corrected chain:</p>
+    <div class="tw" style="margin-top:14px">
+      <table>
+        <thead><tr><th>Hypothesis</th><th>Test</th><th>Outcome</th></tr></thead>
+        <tbody>
+          <tr><td>PhysX GPU kernels missing for <code>sm_120</code><br><span style="color:var(--ink-mute);font-size:.85em">the forum explanation</span></td><td><code>gm.USE_GPU_DYNAMICS</code> and <code>ENABLE_FLATCACHE</code> are already <code>False</code> by default — that path never runs</td><td><span class="chip n">RULED OUT</span></td></tr>
+          <tr><td>torch has no <code>sm_120</code> kernels</td><td>Real: torch 2.6.0+cu124 supports only to <code>sm_90</code>. Installed 2.7.0+cu128 — <code>sm_120</code> present, CUDA matmul OK</td><td><span class="chip n">NOT SUFFICIENT<br>still segfaults</span></td></tr>
+          <tr><td><strong>numpy ABI mismatch</strong></td><td>OmniGibson requires <code>numpy&lt;2.0.0</code>; both machines had <strong>2.2.6</strong>. Pinned back to 1.26.4</td><td><span class="chip y">FIXED THE 3090</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>With numpy pinned on both, and each machine running a torch build that supports its own
+    architecture, everything else identical:</p>
+    <pre style="margin:0;overflow-x:auto;font-family:var(--mono);font-size:.82rem;color:var(--ink-mid);background:var(--surface-2);padding:12px 14px;border-radius:5px">RTX 3090  sm_86    numpy 1.26.4  torch 2.6.0+cu124 (sm_86 ok)    og.launch() -> rc=0
+RTX 5090  sm_120   numpy 1.26.4  torch 2.7.0+cu128 (sm_120 ok)   og.launch() -> SIGSEGV</pre>
+    <p><strong>That is the controlled result</strong> — one variable, two confounds eliminated first.
+    The lesson for me was methodological: a crash reproducing on two machines is evidence of a
+    <em>shared</em> cause, not of the difference between them.</p>
+  </div>
+
+  <div class="finds" style="margin-top:26px">
+    <div class="find"><span class="n">DEFECT</span><h3>setup.sh breaks its own numpy pin</h3>
+      <p><code>setup.sh</code> installs numpy 1.26.4 as OmniGibson requires — then the
+      <strong>JoyLo</strong> dependency chain (mediapipe, mujoco, dm_control) silently re-upgrades it
+      to 2.2.6, breaking the ABI for every pybind11 extension built against 1.x.</p>
+      <p>Anyone running <code>./setup.sh --joylo --eval</code> on a clean machine gets a simulator
+      that segfaults with no usable error. On the 3090 it surfaces first as
+      <code>TypeError: Unable to write from unknown dtype, kind=f, size=0</code>. This cost roughly
+      two hours and is worth reporting upstream.</p></div>
+  </div>
+
+  <div class="stack col" style="margin-top:26px">
+    <p>The competition code was written against v3.7.x. Upstream removed <code>omnigibson/learning/</code>
+    by 3.9, so using a Blackwell-capable stack means abandoning the evaluation harness you are trying
+    to reproduce. This is not a bug in anyone's code — it is what happens when a benchmark moves faster
+    than the work built on it, and it makes a nine-month-old competition entry materially harder to
+    re-run than its "everything is released" framing suggests.</p>
+    <p>Worth separating clearly: the <strong>policy</strong> half is unaffected. JAX 0.5.3 enumerates
+    the RTX 5090, selects the GPU backend, and executes correctly. The constraint is entirely on the
+    <strong>simulation</strong> side.</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><h2>Challenges &amp; insights</h2></div>
+  <div class="finds" style="margin-top:22px">
+    <div class="find"><span class="n">01</span><h3>The constraint was hardware <em>class</em>, not quantity</h3>
+      <p>Compute planning for embodied AI needs a capability filter (RT Cores) before a capacity one. Aggregate
+      VRAM is the wrong metric when the simulator gates you.</p></div>
+    <div class="find"><span class="n">02</span><h3>The cheapest experiment was the most informative</h3>
+      <p>E4 cost zero GPU-hours and produced the sharpest divergence. When the expensive claim can't be re-run,
+      interrogate the <em>artifact it produced</em>. That generalises well past this paper.</p></div>
+    <div class="find"><span class="n">03</span><h3>Released ≠ reproducible</h3>
+      <p>The README calls the same checkpoints both "base models ideal for fine-tuning" (the 0.192 stage) and
+      "our latest models with Q Score of 0.345." Both can't be true, and a reader can't tell which backs the
+      headline without spending GPU-hours.</p></div>
+    <div class="find"><span class="n">04</span><h3>Queue depth is an experimental variable</h3>
+      <p>Delta's A40 partition had 1,486 jobs queued and zero idle nodes — a ~5 hour wait. On a deadline,
+      that mattered more than throughput. Size experiments to the scheduler you have.</p></div>
+    <div class="find"><span class="n">05</span><h3>Documentation drifts faster than hardware</h3>
+      <p>My own notes had b3iq as a Windows box needing WSL2 — the single biggest risk I'd priced. It had been
+      rebuilt as native Ubuntu 24.04. Verify the machine, don't trust the note.</p></div>
+    <div class="find"><span class="n">06</span><h3>What the paper gets right</h3>
+      <p>Choosing RFT over online RL because of the RT/Tensor-core split is genuinely good systems reasoning —
+      and it's buried in a single sentence.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><h2>If I had more time</h2></div>
+  <div class="stack col">
+    <ul>
+      <li><strong>Finish E3</strong>, then run <strong>E1</strong> (per-task eval against Fig 4) — which would
+      also settle the checkpoint ambiguity above.</li>
+      <li><strong>E2:</strong> pt12 vs pt50, testing the pre-training-coverage claim on released artifacts with
+      no training.</li>
+      <li><strong>Test E4's implication directly.</strong> If RFT yield is horizon-limited, then truncating long
+      tasks into sub-episodes <em>before</em> rejection sampling should raise yield on the eleven dead tasks.
+      That's the next step the paper's own analysis points at but doesn't take.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <span>Empiricist review · Openpi Comet (arXiv:2512.10071v3)</span>
+  <span>E4 complete · radio probe in flight</span>
+</footer>
+</div>
+
+<script>
+(function(){
+  var counts=[120,120,120,120,120,118,111,109,65,58,50,44,37,32,31,30,26,24,14,12,11,11,10,9,8,8,8,7,7,6,6,4,4,2,2,2,1,1,1];
+  var max=120, el=document.getElementById('bars');
+  counts.forEach(function(c){
+    var b=document.createElement('div');
+    b.className='bar'+(c>=118?' cap':'');
+    b.style.height=Math.max(2,(c/max)*100)+'%';
+    b.title=c+' episodes';
+    el.appendChild(b);
+  });
+})();
+</script>
+</body></html>

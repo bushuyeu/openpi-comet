@@ -1,0 +1,417 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Compute assessment &middot; Openpi Comet reproduction</title><style>
+:root{--ground:#FCFCFD;--surface:#F2F3F6;--surface-2:#E9EBF0;--ink:#14161B;--ink-mid:#3D434F;
+--ink-mute:#5A606E;--rule:#DCDFE6;--rule-soft:#E8EAEF;--accent:#A85C08;--pass:#15654A;
+--pass-bg:#DCEFE6;--fail:#8E2620;--fail-bg:#F6E1DF;
+--sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+--serif:ui-serif,"Iowan Old Style",Georgia,"Times New Roman",serif;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#0E1014;--surface:#161920;
+--surface-2:#1E222B;--ink:#E9EBF1;--ink-mid:#BFC5D2;--ink-mute:#939AAA;--rule:#272C36;
+--rule-soft:#1E222B;--accent:#E0A040;--pass:#5DC79C;--pass-bg:#122C23;--fail:#E9827A;--fail-bg:#341A18}}
+:root[data-theme="dark"]{--ground:#0E1014;--surface:#161920;--surface-2:#1E222B;--ink:#E9EBF1;
+--ink-mid:#BFC5D2;--ink-mute:#939AAA;--rule:#272C36;--rule-soft:#1E222B;--accent:#E0A040;
+--pass:#5DC79C;--pass-bg:#122C23;--fail:#E9827A;--fail-bg:#341A18}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--serif);
+font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:80ch;margin:0 auto;padding:0 26px 100px}
+h1,h2,h3,h4,.nav{font-family:var(--sans)}
+h1{font-size:2.1rem;line-height:1.1;letter-spacing:-.03em;font-weight:800;margin:8px 0 4px;text-wrap:balance}
+h2{font-size:1.45rem;line-height:1.15;letter-spacing:-.02em;font-weight:750;margin:44px 0 2px;text-wrap:balance}
+h3{font-size:1.1rem;font-weight:700;margin:30px 0 2px}
+p,ul,ol{margin:14px 0}
+a{color:var(--accent)}
+strong{font-weight:640}
+code{font-family:var(--mono);font-size:.87em;background:var(--surface-2);padding:.1em .38em;border-radius:3px}
+pre{background:var(--surface-2);padding:13px 15px;border-radius:6px;overflow-x:auto}
+pre code{background:none;padding:0;font-size:.82rem;line-height:1.5}
+blockquote{margin:16px 0;padding:2px 0 2px 18px;border-left:3px solid var(--accent);color:var(--ink-mid)}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.87rem;margin:6px 0}
+th{text-align:left;font-size:.71rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute);
+padding:11px 14px;border-bottom:1px solid var(--rule);background:var(--surface-2);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top;font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--surface);margin:14px 0}
+.nav{display:flex;flex-wrap:wrap;gap:6px 18px;padding:22px 0 18px;margin-bottom:26px;
+border-bottom:1px solid var(--rule);font-size:.83rem}
+.nav a{color:var(--ink-mute);text-decoration:none;font-weight:600}
+.nav a:hover{color:var(--accent)}
+.nav a.on{color:var(--accent)}
+.nav a.ext{margin-left:auto;color:var(--ink-mute)}
+hr{border:0;border-top:1px solid var(--rule);margin:36px 0}
+footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--rule);
+font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
+@media(max-width:640px){body{font-size:16px}.wrap{padding:0 16px 70px}.nav a.ext{margin-left:0}}
+</style></head><body><div class="wrap"><nav class="nav"><a href="index.html">Reproduction report</a><a href="experiment-design.html">Experiment design</a><a href="rft-dataset.html">RFT dataset forensics</a><a href="compute.html" class="on">Compute assessment</a><a class="ext" href="https://github.com/bushuyeu/openpi-comet">repo &#8599;</a></nav><h1 id="compute-assessment-reproducing-openpi-comet-251210071v3">Compute assessment — reproducing Openpi Comet (2512.10071v3)</h1>
+<p>Written before execution. Purpose: decide <em>where</em> to run, and <em>what</em> is actually reproducible
+at that scale, before spending allocation.</p>
+<p>Paper: Team Comet, 2nd place, 2025 BEHAVIOR Challenge. π0.5 backbone, Q-score 0.2514 (test) /
+0.345 (post-challenge validation).
+Fork: <code>bushuyeu/openpi-comet</code> (upstream <code>mli0603/openpi-comet</code>).</p>
+<hr />
+<h2 id="1-the-decisive-constraint-rt-cores">1. The decisive constraint: RT Cores</h2>
+<p>The paper states it plainly in §4.3, as its reason for choosing RFT over online RL:</p>
+<blockquote>
+<p>"online RL requires a heterogeneous compute setup: <strong>GPUs with RT Cores are needed for
+simulation</strong>, while GPUs with Tensor Cores are needed for model training and rollouts."</p>
+</blockquote>
+<p>BEHAVIOR-1K runs on OmniGibson, which runs on Isaac Sim. NVIDIA's Isaac Sim requirements
+list RTX-class GPUs only, and <strong>explicitly name A100 and H100 as unsupported</strong> because they
+have no RT Cores. Volta (V100) is further below that line.</p>
+<p>This single fact reorders the whole fleet. Raw FLOPs and VRAM are close to irrelevant here —
+the simulator is the bottleneck and the gate.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Architecture</th>
+<th>Example</th>
+<th>RT Cores</th>
+<th>Runs OmniGibson?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Volta (sm70)</td>
+<td>V100</td>
+<td>No</td>
+<td><strong>No</strong></td>
+</tr>
+<tr>
+<td>Ampere GA100</td>
+<td>A100</td>
+<td>No</td>
+<td><strong>No</strong></td>
+</tr>
+<tr>
+<td>Hopper</td>
+<td>H100 / H200</td>
+<td>No</td>
+<td><strong>No</strong></td>
+</tr>
+<tr>
+<td>Ampere GA102</td>
+<td><strong>A40</strong>, A10, RTX 3090</td>
+<td>Yes</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>Ada</td>
+<td>L40S, RTX 4090</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Blackwell</td>
+<td><strong>RTX 5090</strong></td>
+<td>Yes</td>
+<td>Yes (needs Isaac Sim 5.x)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Note this cuts the <em>opposite</em> way from normal ML work. The paper trained on H200s — but you
+cannot <em>evaluate</em> on an H200, and evaluation is the only part of this paper reproducible at
+our scale.</p>
+<hr />
+<h2 id="2-fleet-scorecard">2. Fleet scorecard</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>GPU</th>
+<th>RT?</th>
+<th>VRAM</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Delta NCSA</strong> <code>gpuA40x4</code></td>
+<td>4× A40</td>
+<td><strong>Yes</strong></td>
+<td>48 GB ea</td>
+<td><strong>Primary.</strong> Only resource that is both RT-capable and multi-GPU.</td>
+</tr>
+<tr>
+<td><strong>b3iq</strong> (Igor's box)</td>
+<td>RTX 5090</td>
+<td><strong>Yes</strong></td>
+<td>32 GB</td>
+<td><strong>Secondary / soak.</strong> Windows→WSL2 is the risk.</td>
+</tr>
+<tr>
+<td>KOA</td>
+<td>mixed, unverified</td>
+<td>?</td>
+<td>?</td>
+<td><strong>Unknown</strong> — needs <code>koa availability</code>. Doc flags "driver 590 hangs pi05".</td>
+</tr>
+<tr>
+<td>Jetstream2 <code>pi05-rlt</code></td>
+<td>A100 vGPU slice</td>
+<td><strong>No</strong></td>
+<td>10–40 GB</td>
+<td><strong>Ruled out.</strong> No RT Cores, and vGPU partitioning on top. 2000 SU ≈ 62–125 hr anyway.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="why-delta-wins">Why Delta wins</h3>
+<ul>
+<li><strong>A40 has RT Cores</strong> and 48 GB — comfortably above the repo's stated ceilings
+  (inference &gt; 8 GB, LoRA &gt; 22.5 GB, full FT &gt; 70 GB).</li>
+<li><strong>100 four-way A40 nodes.</strong> The eval script takes <code>parallel_evaluator_start_idx</code> /
+  <code>end_idx</code>, so the 10 instances per task shard 4-way across a node with no code changes.
+  This matters more than anything else — see the runtime budget below.</li>
+<li>48 h walltime on production partitions; Apptainer available for the Isaac Sim container.</li>
+<li>Largest allocation of the fleet.</li>
+</ul>
+<h3 id="why-jetstream2-are-out">Why Jetstream2 are out</h3>
+<p>Both are genuinely good boxes that are simply the wrong shape for this paper. Neither can
+render a frame of OmniGibson. Worth stating explicitly so we don't lose a day discovering it
+by running into a Vulkan error.</p>
+<h3 id="the-one-thing-theyre-still-good-for">The one thing they're still good for</h3>
+<p><code>serve_b1k.py</code> binds a <strong>websocket</strong> on <code>0.0.0.0:8000</code>, and the sim connects with
+<code>policy=websocket</code>. Policy inference and simulation are therefore separable across machines,
+and inference needs no RT Cores. If A40 VRAM ever gets contended we can put the policy server
+on the DGX or Jetstream2 and keep only the simulator on Delta — the same heterogeneous split
+the paper describes. Cross-site latency and firewalling make this a fallback, not the plan.</p>
+<hr />
+<h2 id="3-what-is-actually-reproducible">3. What is actually reproducible</h2>
+<p>Ordered by cost. The honest headline: <strong>full reproduction is out of reach; the released
+checkpoints make the interesting claims testable anyway.</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Claim</th>
+<th>Paper's cost</th>
+<th>Ours</th>
+<th>Feasible?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pre-training (pt50)</td>
+<td>50k steps, ~40× H200</td>
+<td>—</td>
+<td><strong>No.</strong> Config is literally named <code>..._gpu40</code>.</td>
+</tr>
+<tr>
+<td>RFT post-training</td>
+<td>3 rounds × ~8500 rollouts</td>
+<td>~3500+ GPU-hr</td>
+<td><strong>No.</strong></td>
+</tr>
+<tr>
+<td>Per-task eval of released ckpt</td>
+<td>—</td>
+<td>~30–60 GPU-hr</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>pt12 vs pt50 comparison</td>
+<td>—</td>
+<td>~30–60 GPU-hr</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>Table 3 inference ablations</td>
+<td>—</td>
+<td>~10–20 GPU-hr</td>
+<td><strong>Yes — cheapest and sharpest</strong></td>
+</tr>
+<tr>
+<td>RFT dataset characterisation</td>
+<td>—</td>
+<td>0</td>
+<td><strong>Yes, free</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="proposed-experiments">Proposed experiments</h3>
+<p><strong>E3 — Table 3 inference-time ablations (run this first).</strong>
+The control-mode and resolution rows of Table 3 are <em>pure inference flags</em>, already wired:</p>
+<pre><code>scripts/serve_b1k.py:67  control_mode = &quot;receeding_horizon&quot; | &quot;temporal_ensemble&quot; | &quot;receeding_temporal&quot;
+scripts/serve_b1k.py:70  max_len = 32
+</code></pre>
+<p>and resolution is one env flag — <code>RGBWrapper</code> swaps 224×224 for the native
+<code>HEAD_RESOLUTION</code>/<code>WRIST_RESOLUTION</code>.</p>
+<p>No training. One short task (<code>turning_on_radio</code>, which Fig 4 shows at 100%). Falsifiable
+prediction from Table 3: temporal-ensemble and receding-temporal collapse to ~0, receding
+horizon does not, and full resolution roughly doubles success (0.30 → 0.60).</p>
+<p>Caveat to state up front: Table 3 was measured on a <em>single-task SFT</em> model, not the released
+pt50 checkpoint. Absolute numbers should <strong>not</strong> match. The reproducible claim is the
+<strong>ordering</strong>, not the values.</p>
+<p><strong>E1 — Per-task eval of <code>pi05-b1kpt50-cs32</code></strong> against Fig 4's per-task accuracies and the
+0.345 aggregate. There is a real ambiguity here worth resolving empirically: the README's
+Model Zoo calls these "base ... checkpoints ... ideal for fine-tuning" (suggesting the 0.192
+pre-training stage), while the Updates line says they are the "Q Score of 0.345" models.
+Those cannot both be true. Measuring settles it.</p>
+<p><strong>E2 — <code>pt12</code> vs <code>pt50</code> on shared tasks.</strong> Not Fig 3 exactly (which sweeps pt1/7/10/50), but
+it tests the same claim — broader pre-training coverage unlocks more tasks — using only
+released artifacts.</p>
+<p><strong>E4 — Characterise <code>delinqu/comet-1.5k</code></strong> (the released RFT dataset) against the paper's
+description: 8500 rollouts/round → 1469 kept after "de-duplication and task balancing". The
+paper credits refined <em>task balancing</em> for 0.224 → 0.345. Zero compute, and it's the only
+handle we have on the post-training claim.</p>
+<h3 id="runtime-budget">Runtime budget</h3>
+<p>The paper warns evaluating one task takes "one hour to nearly a full day." Sharding 10
+instances 4-way across an A40 node is what keeps this tractable.</p>
+<p>Rough total: <strong>150–250 A40 GPU-hours ≈ 40–60 node-hours</strong> on <code>gpuA40x4</code>. Well inside a
+normal ACCESS allocation, but I have not yet confirmed the balance.</p>
+<p>Storage: checkpoints are Orbax (directory-per-parameter), ~14 GB each. The OmniGibson asset
+bundle is the large item — to be verified on scratch, not <code>$HOME</code>. The <strong>10,000-episode
+challenge demo set (119 M frames, 90,000 videos) is not needed</strong> — evaluation uses only the
+checkpoint and its bundled <code>assets/.../norm_stats.json</code>.</p>
+<hr />
+<h2 id="4-known-risks">4. Known risks</h2>
+<ol>
+<li><strong>Isaac Sim on HPC.</strong> The hard part of this whole exercise, and the most likely place to
+   lose a day. Needs headless EGL/Vulkan in an Apptainer container, and a driver on the A40
+   nodes new enough for the pinned Isaac Sim. Verify before committing allocation.</li>
+<li><strong>Delta MFA.</strong> Duo push on every fresh session, keys disabled. Blocks unattended
+   automation; the ControlMaster socket must stay warm.</li>
+<li><strong>b3iq is Windows.</strong> OmniGibson under WSL2 is not a supported path. The 5090 is also
+   Blackwell (sm_120), needing recent Isaac Sim and JAX CUDA builds. Treat as a bonus target.</li>
+<li><strong>KOA driver 590.</strong> Already recorded as hanging pi05. Even if KOA has RT-capable nodes,
+   this needs clearing first.</li>
+</ol>
+<h2 id="5-open-needs-pavel">5. Open — needs Pavel</h2>
+<ul>
+<li>[ ] Delta: active Slurm <code>--account</code> and remaining balance (needs one MFA login)</li>
+<li>[ ] Delta: driver version on <code>gpuA40x4</code> nodes, and whether Apptainer is available</li>
+<li>[ ] KOA: <code>koa availability</code> output — are there any RT-capable nodes?</li>
+<li>[ ] Confirm scope: E3 → E1 → E2 → E4, in that order</li>
+</ul>
+<hr />
+<h2 id="6-addendum-which-clusters-are-worth-signing-up-for">6. Addendum — which clusters are worth signing up for</h2>
+<p>Re-run of the question against the wider national ecosystem, using the same RT-Cores filter.
+The filter is brutal: <strong>most NSF GPU capacity is A100/H100/V100/GH200, none of which can
+render a frame of OmniGibson.</strong> Requesting more of it would buy nothing here.</p>
+<h3 id="do-sign-up">Do sign up</h3>
+<p><strong>1. NRP Nautilus — highest value, sign up first.</strong>
+<a href="https://nrp.ai">National Research Platform</a>, free for research, Kubernetes rather than Slurm.
+It is the single richest pool of RT-capable GPUs in US academic infrastructure, and it exposes
+them as first-class schedulable resources:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>GPU</th>
+<th>Request label</th>
+<th>RT?</th>
+<th>VRAM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NVIDIA A40</td>
+<td><code>nvidia.com/a40</code></td>
+<td>Yes</td>
+<td>48 GB</td>
+</tr>
+<tr>
+<td>RTX A6000</td>
+<td><code>nvidia.com/rtxa6000</code></td>
+<td>Yes</td>
+<td>48 GB</td>
+</tr>
+<tr>
+<td>Quadro RTX 8000</td>
+<td><code>nvidia.com/rtx8000</code></td>
+<td>Yes</td>
+<td>48 GB</td>
+</tr>
+<tr>
+<td><strong>RTX PRO 6000 Blackwell</strong></td>
+<td><code>nvidia.com/rtx6000bw</code></td>
+<td>Yes</td>
+<td>96 GB</td>
+</tr>
+<tr>
+<td>(general pool)</td>
+<td>RTX 4090 / 3090 / A5000 / L40 / 2080Ti</td>
+<td>Yes</td>
+<td>varies</td>
+</tr>
+</tbody>
+</table></div>
+<p>Plus A100/H100/H200/GH200, which are useless for the simulator but fine for the policy server.
+~1,000 GPUs, 9 PB storage, no allocation proposal needed. For an Isaac Sim workload this is
+arguably a <strong>better fit than Delta</strong> — no Duo, no queue, and you can pin an exact GPU model
+with a <code>nvidia.com/gpu.product</code> node affinity. Trade-offs: pods are preemptible, storage needs
+an explicit PVC, and you supply the container.</p>
+<p><strong>2. ACCESS Delta — keep, it's your only RT-capable ACCESS resource.</strong>
+Checked the ACCESS catalog: <strong>Delta's A40 nodes are the only clearly RT-capable GPUs in the
+entire ACCESS inventory.</strong> So Delta isn't just the best ACCESS option, it's effectively the
+only one. Worth requesting a larger allocation on rather than diversifying.</p>
+<h3 id="dont-bother-requesting-for-this-paper">Don't bother requesting (for this paper)</h3>
+<p>None of these can run OmniGibson. Requesting them would waste the application:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>GPU</th>
+<th>Why not</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NCSA DeltaAI</td>
+<td>GH200</td>
+<td>No RT Cores</td>
+</tr>
+<tr>
+<td>TACC Vista</td>
+<td>GH200</td>
+<td>No RT Cores</td>
+</tr>
+<tr>
+<td>TACC Lonestar6</td>
+<td>A100 / H100</td>
+<td>No RT Cores</td>
+</tr>
+<tr>
+<td>TACC Stampede3</td>
+<td>Intel PVC</td>
+<td>Not NVIDIA at all</td>
+</tr>
+<tr>
+<td>PSC Bridges-2</td>
+<td>V100</td>
+<td>Volta</td>
+</tr>
+<tr>
+<td>SDSC Expanse</td>
+<td>V100</td>
+<td>Volta</td>
+</tr>
+<tr>
+<td>Purdue Anvil</td>
+<td>A100</td>
+<td>No RT Cores</td>
+</tr>
+<tr>
+<td>TAMU ACES</td>
+<td>H100 / A30</td>
+<td>No RT Cores (A30 is GA100-based)</td>
+</tr>
+<tr>
+<td>Jetstream2</td>
+<td>A100 vGPU</td>
+<td>No RT Cores (already ruled out)</td>
+</tr>
+</tbody>
+</table></div>
+<p>They remain good for the <em>policy server</em> half of the split — but you already have surplus
+capacity there (DGX, Jetstream2). Tensor-core compute is not your bottleneck; <strong>RT-core
+compute is.</strong></p>
+<h3 id="revised-recommendation">Revised recommendation</h3>
+<p>Run E3 on whichever comes up first:</p>
+<ol>
+<li><strong>NRP Nautilus</strong> with <code>nvidia.com/rtxa6000</code> or <code>nvidia.com/a40</code> — likely fastest to first
+   result, since signup is quick and there's no queue or MFA.</li>
+<li><strong>Delta <code>gpuA40x4</code></strong> — better for the long batch sweep once it's set up (48 h walltime,
+   4-way sharding, non-preemptible).</li>
+</ol>
+<p>These are complementary, not competing: prototype the container on Nautilus, then scale the
+sweep on Delta. Both use the same A40-class target, so the container transfers.</p>
+<p>If you want a paid fallback with zero setup friction, an L40S or RTX 6000 Ada instance on
+Lambda / RunPod costs roughly a dollar an hour and would cover the whole E3 sweep for well
+under $50 — worth keeping in reserve if the Isaac Sim container fights back.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>

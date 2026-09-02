@@ -84,8 +84,16 @@ The 224x224 setting downsamples data that is native at 720 and 480. The gain in 
 
 The count was probably not rebuilt after the last filter step. No result on this page depends on it.
 
-## Conclusion
+## Summary
 
-The report credits task balancing. The data shows the balancing step does little. The distribution stays uneven at 120 to 1.
+| Question | Answer |
+|---|---|
+| Does the balancing step make the set even? | No. It caps the common tasks at 120 and adds nothing to the rare ones |
+| How uneven is the result? | 120 to 1. The top 5 tasks hold 40.8% of the data |
+| What drives which tasks get data? | Episode length. Spearman -0.45 between episodes kept and mean length |
+| How many tasks got nothing? | 11 of 50. About 25,500 rollouts produced no kept episode for them |
+| Does this limit the method? | Yes. It adds no data for the hardest tasks, so it cannot raise the score on them |
 
-The data shows a different pattern. The method collects data where episodes are short. It collects almost none where episodes are long.
+The report credits task balancing. The data shows the step does little. The pattern in the data is a bias by episode length. The method collects where episodes are short and almost nothing where they are long.
+
+For the measured claim about the released checkpoint, see the [experiment](index.html). For what hardware runs this benchmark, see the [hardware page](compute.html).

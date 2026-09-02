@@ -71,3 +71,15 @@ RTX 5090, 32 GB, driver 580.173.02, torch 2.7.0+cu128. At native resolution the 
 We checked the ACCESS-CI catalog. The A40 nodes on NCSA Delta are the only clear RT-Core GPUs in it. DeltaAI, Vista, Lonestar6, Bridges-2, Expanse, Anvil and ACES all use A100, H100, V100 or GH200 cards.
 
 The National Research Platform (nrp.ai) is a better source. It schedules A40, RTX A6000, RTX 8000 and RTX PRO 6000 cards by name, and it is free.
+
+## Summary
+
+| Question | Answer |
+|---|---|
+| What does Isaac Sim require? | RT Cores. The A100, H100, V100 and GH200 do not have them |
+| Does the RTX 5090 work? | Yes, on driver 580.173.02. Driver 595.84 gives a segmentation fault |
+| Was it the GPU generation? | No. That was our first reading and it was wrong. The driver is the cause |
+| What else is needed on the RTX 5090? | torch 2.7.0+cu128. The pinned cu124 build has no sm_120 kernels |
+| Which clusters can run this? | Few. In the ACCESS-CI catalog only the A40 nodes on NCSA Delta are clearly RT-capable |
+
+For the measurement these machines produced, see the [experiment](index.html). For the dataset check that needs no GPU, see the [RFT dataset page](rft-dataset.html).

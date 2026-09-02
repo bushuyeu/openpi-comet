@@ -198,4 +198,36 @@ app = SimulationApp({&quot;headless&quot;: True})
 <p>RTX 5090, 32 GB, driver 580.173.02, torch 2.7.0+cu128. At native resolution the policy server takes about 9 GB. Each Isaac Sim shard takes about 10 GB.</p>
 <h2 id="cluster-note">Cluster note</h2>
 <p>We checked the ACCESS-CI catalog. The A40 nodes on NCSA Delta are the only clear RT-Core GPUs in it. DeltaAI, Vista, Lonestar6, Bridges-2, Expanse, Anvil and ACES all use A100, H100, V100 or GH200 cards.</p>
-<p>The National Research Platform (nrp.ai) is a better source. It schedules A40, RTX A6000, RTX 8000 and RTX PRO 6000 cards by name, and it is free.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>
+<p>The National Research Platform (nrp.ai) is a better source. It schedules A40, RTX A6000, RTX 8000 and RTX PRO 6000 cards by name, and it is free.</p>
+<h2 id="summary">Summary</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What does Isaac Sim require?</td>
+<td>RT Cores. The A100, H100, V100 and GH200 do not have them</td>
+</tr>
+<tr>
+<td>Does the RTX 5090 work?</td>
+<td>Yes, on driver 580.173.02. Driver 595.84 gives a segmentation fault</td>
+</tr>
+<tr>
+<td>Was it the GPU generation?</td>
+<td>No. That was our first reading and it was wrong. The driver is the cause</td>
+</tr>
+<tr>
+<td>What else is needed on the RTX 5090?</td>
+<td>torch 2.7.0+cu128. The pinned cu124 build has no sm_120 kernels</td>
+</tr>
+<tr>
+<td>Which clusters can run this?</td>
+<td>Few. In the ACCESS-CI catalog only the A40 nodes on NCSA Delta are clearly RT-capable</td>
+</tr>
+</tbody>
+</table></div>
+<p>For the measurement these machines produced, see the <a href="index.html">experiment</a>. For the dataset check that needs no GPU, see the <a href="rft-dataset.html">RFT dataset page</a>.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>

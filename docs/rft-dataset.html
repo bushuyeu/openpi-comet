@@ -193,6 +193,36 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 <h2 id="the-frame-count-is-stale">The frame count is stale</h2>
 <p><code>info.json</code> gives <code>total_frames</code> as 12,226,350. The episode lengths in <code>episodes.jsonl</code> sum to 14,896,614. The difference is 2,670,264 frames, or 18%.</p>
 <p>The count was probably not rebuilt after the last filter step. No result on this page depends on it.</p>
-<h2 id="conclusion">Conclusion</h2>
-<p>The report credits task balancing. The data shows the balancing step does little. The distribution stays uneven at 120 to 1.</p>
-<p>The data shows a different pattern. The method collects data where episodes are short. It collects almost none where episodes are long.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>
+<h2 id="summary">Summary</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Does the balancing step make the set even?</td>
+<td>No. It caps the common tasks at 120 and adds nothing to the rare ones</td>
+</tr>
+<tr>
+<td>How uneven is the result?</td>
+<td>120 to 1. The top 5 tasks hold 40.8% of the data</td>
+</tr>
+<tr>
+<td>What drives which tasks get data?</td>
+<td>Episode length. Spearman -0.45 between episodes kept and mean length</td>
+</tr>
+<tr>
+<td>How many tasks got nothing?</td>
+<td>11 of 50. About 25,500 rollouts produced no kept episode for them</td>
+</tr>
+<tr>
+<td>Does this limit the method?</td>
+<td>Yes. It adds no data for the hardest tasks, so it cannot raise the score on them</td>
+</tr>
+</tbody>
+</table></div>
+<p>The report credits task balancing. The data shows the step does little. The pattern in the data is a bias by episode length. The method collects where episodes are short and almost nothing where they are long.</p>
+<p>For the measured claim about the released checkpoint, see the <a href="index.html">experiment</a>. For what hardware runs this benchmark, see the <a href="compute.html">hardware page</a>.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>

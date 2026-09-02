@@ -108,7 +108,20 @@ Fixes are in this fork.
 
 Isaac Sim needs RT Cores. The A100, H100 and V100 do not have them.
 
-The RTX 5090 runs the benchmark on driver 580.173.02. It gives a segmentation fault on driver 595.84. See the [hardware page](compute.html).
+The RTX 5090 runs the benchmark on driver 580.173.02. It gives a segmentation fault on driver 595.84. The [hardware page](compute.html) records what we tested and what we ruled out.
+
+## Summary
+
+| Question | Answer |
+|---|---|
+| Does the released checkpoint reach 1.00 on `turning_on_radio`? | No. 0 successes in 40 runs. 95% CI [0.00, 0.09] |
+| Did we use a poor configuration? | No. Every setting is the one Table 3 picks |
+| Does the harness work? | Yes. 4 successes in 67 training runs, each scoring a full 1.000 |
+| Is there a train and test gap? | Not shown. The two intervals overlap |
+| Why does the claim fail? | Unresolved. The README calls the same checkpoint both the pre-training model and the Q 0.345 model |
+| Can we repeat the resolution ablation? | No. The 224x224 models are not public, and the intervals overlap at both sample sizes |
+
+The report also credits a task-balancing step for part of its score. We checked that claim against the dataset the step produced. See the [RFT dataset page](rft-dataset.html).
 
 ---
 

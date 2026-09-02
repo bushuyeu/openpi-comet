@@ -237,6 +237,42 @@ font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 <p>Fixes are in this fork.</p>
 <h2 id="hardware">Hardware</h2>
 <p>Isaac Sim needs RT Cores. The A100, H100 and V100 do not have them.</p>
-<p>The RTX 5090 runs the benchmark on driver 580.173.02. It gives a segmentation fault on driver 595.84. See the <a href="compute.html">hardware page</a>.</p>
+<p>The RTX 5090 runs the benchmark on driver 580.173.02. It gives a segmentation fault on driver 595.84. The <a href="compute.html">hardware page</a> records what we tested and what we ruled out.</p>
+<h2 id="summary">Summary</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Does the released checkpoint reach 1.00 on <code>turning_on_radio</code>?</td>
+<td>No. 0 successes in 40 runs. 95% CI [0.00, 0.09]</td>
+</tr>
+<tr>
+<td>Did we use a poor configuration?</td>
+<td>No. Every setting is the one Table 3 picks</td>
+</tr>
+<tr>
+<td>Does the harness work?</td>
+<td>Yes. 4 successes in 67 training runs, each scoring a full 1.000</td>
+</tr>
+<tr>
+<td>Is there a train and test gap?</td>
+<td>Not shown. The two intervals overlap</td>
+</tr>
+<tr>
+<td>Why does the claim fail?</td>
+<td>Unresolved. The README calls the same checkpoint both the pre-training model and the Q 0.345 model</td>
+</tr>
+<tr>
+<td>Can we repeat the resolution ablation?</td>
+<td>No. The 224x224 models are not public, and the intervals overlap at both sample sizes</td>
+</tr>
+</tbody>
+</table></div>
+<p>The report also credits a task-balancing step for part of its score. We checked that claim against the dataset the step produced. See the <a href="rft-dataset.html">RFT dataset page</a>.</p>
 <hr />
 <p>Figures are from the report, used under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>

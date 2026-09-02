@@ -1,182 +1,113 @@
 # The radio probe
 
-A test of one claim from *Openpi Comet* (arXiv:2512.10071v3).
-
-## Result in one line
-
-The report gives a success rate of 1.00 for `turning_on_radio`. We measure **0 successes in 40 runs**, on two GPUs, using the settings the report favours. The 95% confidence interval is [0.00, 0.09].
-
-A positive control on training data gives 4 successes in 67 runs, so the test harness records successes.
-
-## The claim
-
-Figure 4 of the report gives a success rate of **1.00** for the task `turning_on_radio`. The report also uses this task for every cell of Table 3 and Table 4.
-
-Figure 4 reports 25 tasks with a non-zero rate, out of 50. The spread:
-
-| Success rate | Number of tasks |
-|---|---|
-| **1.00** | **8** (includes `turning_on_radio`) |
-| 0.80 | 2 |
-| 0.60, 0.50 | 1 each |
-| 0.40, 0.30 | 2 each |
-| 0.20 | 4 |
-| 0.10 | 5 |
-| 0.00 | 25 (not plotted) |
-
-Table 2 gives the Q-scores for the whole benchmark.
-
-| Stage | Q-score |
-|---|---|
-| Pre-training | 0.192 |
-| Post-training | **0.345** |
-| Theoretical best | 0.611 |
-
-Figure 4 shows the post-training model at Q 0.345.
-
-## Why this task
-
-- The authors chose it. Their own ablations run on it.
-- The claim is exact. A rate of 1.00 is easy to disprove.
-- It is the shortest task in the benchmark. 934 frames is 31 seconds at 30 fps. The next shortest task is 2.5 times longer.
-
-## Setup
-
-| Item | Value |
-|---|---|
-| Machine | RTX 3090, 24 GB. A second run used an RTX 5090, 32 GB |
-| Stack | BEHAVIOR-1K v3.7.2, Isaac Sim 4.5, numpy 1.26.4. torch 2.6.0+cu124 on the RTX 3090, torch 2.7.0+cu128 on the RTX 5090 |
-| Policy | Released checkpoint `pi05-b1kpt50-cs32` |
-| Control mode | Receding horizon, `max_len=32` |
-| Resolution | Native. Head 720x720, wrist 480x480 |
-| Instances | 20 public test instances |
-
-Every setting is the one the report favours.
-
-- Receding horizon is the best control mode in Table 3 row #1. It gives 0.25 there. The other two modes give 0.00.
-- `max_len=32` matches the checkpoint. `pi05-b1kpt50-cs32` predicts 32 actions per chunk.
-- Native resolution is the better setting in Table 3 row #4. It gives 0.60 against 0.30 for 224x224.
-- `turning_on_radio` is the task the report scores at 1.00.
-
-The report used 10 instances. The public file supplies 20. We use all 20. This makes the confidence interval half as wide.
+We test one claim from *Openpi Comet* ([arXiv:2512.10071v3](https://arxiv.org/abs/2512.10071)).
 
 ## Result
 
+The report gives **1.00** for `turning_on_radio`. We measure **0 successes in 40 runs**.
+
 | Run | Report | n | Ours | 95% CI |
 |---|---|---|---|---|
-| Baseline, RTX 3090 | 1.00 | 20 | 0.00 | [0.00, 0.16] |
-| Baseline, RTX 5090 | 1.00 | 20 | 0.00 | [0.00, 0.16] |
+| RTX 3090 | 1.00 | 20 | 0.00 | [0.00, 0.16] |
+| RTX 5090 | 1.00 | 20 | 0.00 | [0.00, 0.16] |
 | **Combined** | **1.00** | **40** | **0.00** | **[0.00, 0.09]** |
 
-The interval excludes 1.00 by a wide margin. A rate of 1.00 cannot produce 40 failures.
+A rate of 1.00 cannot produce 40 failures.
 
-The policy failed every instance. Each episode ran to the step limit of 4300 steps. The partial-credit Q-score was 0.000 every time. The step limit is the default, which is two times the average human demo length.
+## The claim
 
-A second machine gives the same result. The RTX 5090 run used the same policy, the same native resolution and the same 20 test instances. The card, the driver and the torch build differ. The simulator is the same version.
+![Figure 4 from the report](fig4.png)
 
-## Is the test harness good?
+*Figure 4 from the report. `turning_on_radio` is the first bar, at 100.*
 
-This is the first question to ask, because a broken harness also gives zero.
+## The settings are the ones the report picks
 
-We ran the same policy on **training instances**. The policy saw this data during training, so it must do better here.
+![Table 3 from the report](table3.png)
 
-| Run | Machine | Runs | Successes | Rate | 95% CI |
-|---|---|---|---|---|---|
-| Train instances | b3iq | 47 | 2 | 0.04 | [0.01, 0.14] |
-| Train instances | marklxxxv | 20 | 2 | 0.10 | [0.03, 0.30] |
-| **Train, combined** | both | **67** | **4** | **0.06** | **[0.02, 0.14]** |
-| **Test, combined** | both | **40** | **0** | **0.00** | **[0.00, 0.09]** |
+*Table 3 from the report. All rows use `turning_on_radio`.*
 
-The harness can record a success. It is not dead. All four successes scored a full `q_score` of 1.000, not partial credit.
+| Item | Value | Why |
+|---|---|---|
+| Control mode | Receding horizon | Best in row #1. The other two give 0.00 |
+| `max_len` | 32 | Matches the checkpoint chunk size |
+| Resolution | Native, 720 and 480 | Better in row #4. 0.60 against 0.30 |
+| Policy | `pi05-b1kpt50-cs32` | The released checkpoint |
+| Instances | 20 | The public file supplies 20. The report used 10 |
 
-A failed episode runs to the 4300-step cap. The successful episodes stopped early, at 1329 and 1632 steps on marklxxxv. The episode ends when the task is complete, so the harness detects completion.
+Stack: BEHAVIOR-1K v3.7.2, Isaac Sim 4.5, numpy 1.26.4.
 
-The two combined intervals still overlap, [0.02, 0.14] against [0.00, 0.09]. We cannot show that the train rate differs from the test rate. The control proves the harness works. It does not prove a train and test gap.
+## The harness works
 
-The policy solves about 6 percent of training runs and 0 percent of test runs. It fails the rest completely.
+We ran the same policy on training instances.
 
-## The same instance gives different results
+| Set | Runs | Successes | Rate | 95% CI |
+|---|---|---|---|---|
+| Train | 67 | 4 | 0.06 | [0.02, 0.14] |
+| Test | 40 | 0 | 0.00 | [0.00, 0.09] |
 
-Four training instances ran twice. Two of them changed outcome between runs.
+All four successes scored a full 1.000. A failed episode runs to the 4300-step cap. The successes stopped at 1329 and 1632 steps, so the harness detects completion.
+
+The intervals overlap. We do not claim a train and test gap.
+
+## One run per instance is noisy
+
+Four training instances ran twice. Two changed outcome.
 
 | Instance | First run | Second run |
 |---|---|---|
 | 1 | 0.000 | **1.000** |
-| 2 | 0.000 | 0.000 |
-| 3 | 0.000 | 0.000 |
 | 4 | **1.000** | 0.000 |
 
-Both successes come from instances that failed on their other run. One run per instance is a noisy measurement.
+Both successes come from instances that failed on their other run. Figure 4 gives 1.00 from ten single runs. Table 3 values move in steps of 0.05 to 0.10. Those values carry variance the tables do not show.
 
-This applies to the report as well. Figure 4 gives 1.00 from ten single runs. Table 3 and Table 4 give values that move in steps of 0.05 to 0.10. If a run can change outcome, those values carry more variance than the tables show.
+## Why 0/40 and not 1.00
 
-## What went wrong first
-
-The first run gave 0/20 at 224x224 resolution. That result was wrong, and the error was ours.
-
-The released checkpoint needs native resolution. At 224x224 it scores zero even on training data. We changed the default wrapper to 224x224 to match Table 3. That was a mistake. The 224x224 numbers in Table 3 come from single-task models trained at that resolution. Those models are not public.
-
-The positive control found this error. Without the control, we would have reported a false result about the authors' work.
-
-The RTX 5090 run started at 224x224 and gave 0/20. It then gave 0/20 at native resolution as well. On the test instances both resolutions score zero, so that run cannot separate the two. The evidence that 224x224 zeroes the checkpoint comes from the train instances, not from the test instances.
-
-## Three readings of 0/20
+Three readings.
 
 1. The claim does not reproduce.
 2. The released checkpoint is not the model in Figure 4.
-3. Our setup is still wrong in some way we did not find.
+3. Our setup is wrong in a way we did not find.
 
-We checked reading 2. The evidence does not support it.
+Reading 2 does not resolve. The README calls the same files both things.
 
 | Evidence | Points to |
 |---|---|
-| Checkpoint built 2025-12-30 | Between the Dec 06 release and the Jan 03 release of the Q 0.345 model |
-| Model card text | "the latest model weights of Team Comet" |
-| Directory name `pi05-b1kpt50-cs32` | Matches the pre-training config name |
-| README model zoo text | "base VLA model checkpoints ... ideal for fine-tuning" |
+| Built 2025-12-30, between the two releases | The Q 0.345 model |
+| Model card: "the latest model weights" | The Q 0.345 model |
+| Directory name `pi05-b1kpt50-cs32` | The pre-training config |
+| README: "base ... ideal for fine-tuning" | The pre-training model |
 
-The build date and the model card point to the Q 0.345 model. The directory name and the model-zoo text point to the pre-training model. The README calls the same files both things. We cannot settle this from the public record.
-
-Reading 3 is limited by the control. The policy succeeds on training instances at native resolution. A dead harness cannot do that.
+Reading 3 is limited by the control. A dead harness cannot score 1.000.
 
 ## What we cannot test
 
-Table 3 row #4 compares the two resolutions.
+Table 3 row #4 compares 224x224 against native. We cannot repeat it.
 
-| Image resolution | Report |
-|---|---|
-| Head 224, wrist 224 | 0.30 |
-| Head 720, wrist 480 | **0.60** |
+1. The 224x224 models are single-task models trained at that resolution. They are not public.
+2. The intervals overlap at 10 instances and at 20. The comparison is not resolvable at either size.
 
-We cannot repeat this for two reasons.
+## Our first run was wrong
 
-1. The 224x224 models are not public.
-2. At 10 instances the two intervals overlap. At 20 they still overlap. The comparison is not resolvable at either sample size.
+The first run gave 0/20 at 224x224. The released checkpoint needs native resolution. At 224x224 it scores zero even on training data.
 
-## Setup problems found
+We set 224x224 to match Table 3. That was our error. The positive control found it. Without the control we would have published a false result.
 
-Three faults block the documented path. Each one stops evaluation.
+## Setup faults
 
-1. `base_config.yaml` points at `behavior.learning.wrappers.RGBWrapper`. After the install step in the README, the package is `omnigibson.learning`. Hydra raises `InstantiationException`.
-2. `setup.sh` installs numpy 1.26.4. The `--joylo` dependencies then upgrade numpy to 2.x. This breaks the ABI, and `og.launch()` gives a segmentation fault.
+Three faults block the documented path.
+
+1. `base_config.yaml` points at `behavior.learning.wrappers.RGBWrapper`. After the README install step the package is `omnigibson.learning`. Hydra raises `InstantiationException`.
+2. `setup.sh` installs numpy 1.26.4. The `--joylo` dependencies upgrade it to 2.x. This breaks the ABI and `og.launch()` gives a segmentation fault.
 3. `setup.sh` downloads the 2026 task instances. `eval_custom.py` reads the 2025 instances. Nothing downloads them.
 
-Fixes for all three are in this fork.
+Fixes are in this fork.
 
-## Hardware note
+## Hardware
 
-Isaac Sim needs RT Cores. The A100, H100 and V100 do not have them and cannot run this benchmark. An RTX 5090 has RT Cores and runs the benchmark. It needs torch 2.7.0+cu128, because the pinned cu124 build has no sm_120 kernels. It also needs a driver that the Kit build supports. We tested two. Driver 580.173.02 works. Driver 595.84 gives a segmentation fault in the Omniverse RTX renderer. See the [hardware page](compute.html).
+Isaac Sim needs RT Cores. The A100, H100 and V100 do not have them.
 
-## What we did not run
+The RTX 5090 runs the benchmark on driver 580.173.02. It gives a segmentation fault on driver 595.84. See the [hardware page](compute.html).
 
-We stopped the control-mode arm of Table 3 after 1 instance. Table 3 row #1 gives 0.00 for temporal ensemble and 0.00 for receding temporal.
+---
 
-| Control mode | Report |
-|---|---|
-| Temporal ensemble | 0.00 |
-| Receding temporal | 0.00 |
-| Receding horizon | 0.25 |
-
-We used the time for the positive control instead. The reason is that this policy gives 0.00 in every condition we tested. If the two control modes also give 0.00, they agree with the report, but the agreement means little. A policy that always fails matches every prediction of zero.
-
-The control tells us something the arm cannot. It shows the harness can score above zero.
+Figures are from the report, used under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

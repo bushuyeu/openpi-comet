@@ -67,6 +67,7 @@ border-bottom:1px solid var(--rule);font-size:.83rem}
 .nav a:hover{color:var(--accent)}
 .nav a.on{color:var(--accent)}
 .nav a.ext{margin-left:auto;color:var(--ink-mute)}
+img{max-width:100%;height:auto;display:block;margin:14px 0;border:1px solid var(--rule);border-radius:5px}
 hr{border:0;border-top:1px solid var(--rule);margin:36px 0}
 footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--rule);
 font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}

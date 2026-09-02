@@ -1,6 +1,14 @@
 # The radio probe
 
-We test one claim from *Openpi Comet* ([arXiv:2512.10071v3](https://arxiv.org/abs/2512.10071)).
+*Openpi Comet* ([arXiv:2512.10071v3](https://arxiv.org/abs/2512.10071)) took second place in the 2025 BEHAVIOR Challenge. The team released the code, two checkpoints and their post-training dataset.
+
+This page tests one claim from the report. Figure 4 gives a success rate of **1.00** for the task `turning_on_radio`. We pick that claim for three reasons.
+
+- The authors chose the task. Every cell of Table 3 and Table 4 uses it.
+- The claim is exact. A rate of 1.00 is easy to disprove.
+- The task is the shortest in the benchmark. 934 frames is 31 seconds at 30 fps. The next shortest task is 2.5 times longer.
+
+We run the released checkpoint on the 20 public test instances, at the settings the report picks, on two machines.
 
 ## Result
 

@@ -43,7 +43,14 @@ footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--rule);
 font-family:var(--mono);font-size:.75rem;color:var(--ink-mute)}
 @media(max-width:640px){body{font-size:16px}.wrap{padding:0 16px 70px}.nav a.ext{margin-left:0}}
 </style></head><body><div class="wrap"><nav class="nav"><a href="index.html" class="on">The experiment</a><a href="rft-dataset.html">RFT dataset</a><a href="compute.html">Hardware</a><a class="ext" href="https://github.com/bushuyeu/openpi-comet">repo &#8599;</a></nav><h1 id="the-radio-probe">The radio probe</h1>
-<p>We test one claim from <em>Openpi Comet</em> (<a href="https://arxiv.org/abs/2512.10071">arXiv:2512.10071v3</a>).</p>
+<p><em>Openpi Comet</em> (<a href="https://arxiv.org/abs/2512.10071">arXiv:2512.10071v3</a>) took second place in the 2025 BEHAVIOR Challenge. The team released the code, two checkpoints and their post-training dataset.</p>
+<p>This page tests one claim from the report. Figure 4 gives a success rate of <strong>1.00</strong> for the task <code>turning_on_radio</code>. We pick that claim for three reasons.</p>
+<ul>
+<li>The authors chose the task. Every cell of Table 3 and Table 4 uses it.</li>
+<li>The claim is exact. A rate of 1.00 is easy to disprove.</li>
+<li>The task is the shortest in the benchmark. 934 frames is 31 seconds at 30 fps. The next shortest task is 2.5 times longer.</li>
+</ul>
+<p>We run the released checkpoint on the 20 public test instances, at the settings the report picks, on two machines.</p>
 <h2 id="result">Result</h2>
 <p>The report gives <strong>1.00</strong> for <code>turning_on_radio</code>. We measure <strong>0 successes in 40 runs</strong>.</p>
 <div class="tw"><table>

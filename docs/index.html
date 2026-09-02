@@ -106,9 +106,9 @@ makes the confidence interval half as wide.</p>
 <tr>
 <td>Baseline</td>
 <td><strong>1.00</strong></td>
-<td>19</td>
+<td>20</td>
 <td><strong>0.00</strong></td>
-<td>[0.00, 0.17]</td>
+<td>[0.00, 0.16]</td>
 </tr>
 </tbody>
 </table></div>
@@ -136,7 +136,7 @@ training, so it must do better here.</p>
 </tr>
 <tr>
 <td>Test instances</td>
-<td>19</td>
+<td>20</td>
 <td>0</td>
 <td>0.000</td>
 </tr>
@@ -153,7 +153,7 @@ That was a mistake. The 224x224 numbers in Table 3 come from single-task models
 trained at that resolution. Those models are not public.</p>
 <p>The positive control found this error. Without the control, we would have
 reported a false result about the authors' work.</p>
-<h2 id="three-readings-of-019">Three readings of 0/19</h2>
+<h2 id="three-readings-of-020">Three readings of 0/20</h2>
 <ol>
 <li>The claim does not reproduce.</li>
 <li>The released checkpoint is not the model in Figure 4. The README calls it both
@@ -188,5 +188,9 @@ We cannot repeat this for two reasons.</p>
 this benchmark. An RTX 5090 has RT Cores but gives a segmentation fault, because
 BEHAVIOR-1K v3.7.2 pins torch cu124, which does not support sm_120.</p>
 <h2 id="still-running">Still running</h2>
-<p>The control-mode arm of Table 3 runs next. The report gives 0.00 for temporal
-ensemble and 0.00 for receding temporal.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>
+<p>The control-mode arm of Table 3 runs now. The report gives 0.00 for temporal
+ensemble and 0.00 for receding temporal.</p>
+<p>A warning about those two results. This policy gives 0.00 in every condition we
+tested. If the two control modes also give 0.00, they agree with the report. That
+agreement means little. A policy that always fails matches every prediction of
+zero.</p><footer>Reproduction of <em>Openpi Comet</em> (arXiv:2512.10071v3) &middot; empiricist review &middot; sources in <a href="https://github.com/bushuyeu/openpi-comet">bushuyeu/openpi-comet</a></footer></div></body></html>
